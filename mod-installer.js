@@ -12,8 +12,9 @@ const path = require("node:path");
 const { Readable } = require("node:stream");
 const { pipeline } = require("node:stream/promises");
 
+const VERSION = "1.0.0";
 const API = "https://api.modrinth.com/v2";
-const USER_AGENT = "mod-installer/1.0.0 (friend-group Minecraft mod sync; Node.js CLI)";
+const USER_AGENT = `mod-installer/${VERSION} (friend-group Minecraft mod sync; Node.js CLI)`;
 const DOWNLOAD_CONCURRENCY = 3;
 
 // In standalone binaries, build.js replaces null with the group's manifest URL so
@@ -32,6 +33,7 @@ Options:
                  for this OS). Point this at your server's mods folder for servers.
   --dry-run      Show what would be added/kept/removed without changing anything
   --no-remove    Add and update mods, but never delete jars that aren't in the manifest
+  --version      Print the version and exit
   -h, --help     Show this help
 
 Manifest format:
@@ -51,7 +53,10 @@ function parseArgs(argv) {
       if (!opts.dir) fail("--dir requires a path");
     } else if (arg === "--dry-run") opts.dryRun = true;
     else if (arg === "--no-remove") opts.noRemove = true;
-    else if (arg === "--help" || arg === "-h") {
+    else if (arg === "--version") {
+      console.log(`mod-installer ${VERSION}`);
+      process.exit(0);
+    } else if (arg === "--help" || arg === "-h") {
       console.log(USAGE);
       process.exit(0);
     } else if (arg.startsWith("-")) fail(`Unknown flag: ${arg}\n\n${USAGE}`);
@@ -188,7 +193,12 @@ async function resolveInstallSet(manifest) {
       );
     }
     versions.sort((a, b) => new Date(b.date_published) - new Date(a.date_published));
-    const version = versions[0];
+    // Prefer stable builds: the newest release, falling back to the newest beta,
+    // then alpha, only when no stabler channel exists for this game version + loader.
+    const version =
+      versions.find((v) => v.version_type === "release") ??
+      versions.find((v) => v.version_type === "beta") ??
+      versions[0];
     const file = version.files?.find((f) => f.primary) ?? version.files?.[0];
     if (!file) throw new Error(`Modrinth lists no files for ${project.title} ${version.version_number}`);
     if (!file.hashes?.sha512) throw new Error(`Modrinth returned no SHA-512 hash for ${file.filename}`);
@@ -204,7 +214,8 @@ async function resolveInstallSet(manifest) {
       size: file.size ?? 0,
       requiredBy,
     });
-    console.log(`  ${project.title} ${version.version_number}${requiredBy ? `  (dependency of ${requiredBy})` : ""}`);
+    const channelNote = version.version_type === "release" ? "" : `  [${version.version_type} — no release build available]`;
+    console.log(`  ${project.title} ${version.version_number}${channelNote}${requiredBy ? `  (dependency of ${requiredBy})` : ""}`);
 
     for (const dep of version.dependencies ?? []) {
       if (dep.dependency_type !== "required") continue;

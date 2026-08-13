@@ -14,9 +14,9 @@ curl -fsSL https://raw.githubusercontent.com/lilkuzco-dev/mod-installer/main/mod
 
 Append ` --dry-run` to preview what would change without touching anything.
 
-**Without Node**, use the standalone app (ask whoever maintains the list — it's built from this repo): `mod-installer` on macOS or `mod-installer.exe` on Windows. Just double-click it; the group's mod list is built in.
+**Without Node**, download the standalone app from the [releases page](https://github.com/lilkuzco-dev/mod-installer/releases/latest): `mod-installer` for macOS (Apple Silicon) or `mod-installer.exe` for Windows x64. Just double-click it; the group's mod list is built in.
 
-> macOS blocks unsigned apps downloaded from the internet: the first time, right-click the file → Open → Open (or run `xattr -d com.apple.quarantine ./mod-installer`).
+> macOS blocks unsigned apps downloaded from the internet: the first time, right-click the file → Open → Open (or run `xattr -d com.apple.quarantine ./mod-installer`). On an Intel Mac, use the Node one-liner above instead — the binary is Apple Silicon only.
 
 ## Running from a checkout
 
@@ -68,11 +68,12 @@ You don't need to list dependencies (like Fabric API) — required dependencies 
 | `--dir <path>` | Sync this mods folder instead of the auto-detected one |
 | `--dry-run` | Print planned adds/keeps/removes; change nothing |
 | `--no-remove` | Add and update mods, but never delete jars not in the manifest |
+| `--version` | Print the version and exit |
 | `-h`, `--help` | Show usage |
 
 ## What a sync does
 
-1. Resolves each slug to the **newest** Modrinth version matching your `minecraft` + `loader`, then recursively adds all *required* dependencies (deduped). Fails with a clear error naming the mod if no compatible version exists.
+1. Resolves each slug to the newest **release-channel** Modrinth version matching your `minecraft` + `loader`, falling back to the newest beta, then alpha, only when no stable release exists (the output flags any non-release picks). Required dependencies are added recursively (deduped), with the same channel preference. Fails with a clear error naming the mod if no compatible version exists.
 2. Backs up your current mods folder to a sibling `mods-backup-<timestamp>/` before touching anything.
 3. Makes the folder match the resolved set exactly: downloads missing jars, keeps ones that already match (verified by SHA-512), re-downloads corrupted ones, and **removes jars not in the list** (unless `--no-remove` — use that if you keep personal local mods).
 4. Verifies every download against Modrinth's SHA-512 hash; retries once on mismatch, then fails loudly with a non-zero exit code.
