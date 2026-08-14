@@ -8,9 +8,9 @@
   ],
   "extra_mods": [
     {
-      "filename": "vibranium-1.5.0.jar",
-      "url": "https://github.com/lilkuzco-dev/vibranium/releases/download/v1.5.0/vibranium-1.5.0.jar",
-      "sha512": "92ed2b786b82e6aa9f8f5755111c09daa2a1597e65124cb21bbf763ebf85c8c62c550e72d4e95869d6b5a409225a0da8e216b4ceb476f893f318149907d249c5"
+      "filename": "vibranium-1.6.0.jar",
+      "url": "https://github.com/lilkuzco-dev/vibranium/releases/download/v1.6.0/vibranium-1.6.0.jar",
+      "sha512": "5421f13a2471c95ecfb585714d5919d9763e4064d7b72a9bd7c6ecf517df8a278196ce4b0232622cdaa58105fa61abddd230ce2751350b5fecd29dd74d1ed3c6"
     },
     {
       "filename": "warfront-0.1.0.jar",
