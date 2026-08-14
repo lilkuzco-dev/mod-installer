@@ -1,6 +1,6 @@
 {
   "name": "mod-installer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Keep a friend group's Minecraft mods folders in sync with one shared manifest, via Modrinth",
   "bin": { "mod-installer": "./mod-installer.js" },
   "scripts": {

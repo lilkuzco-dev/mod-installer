@@ -14,6 +14,8 @@ curl -fsSL https://raw.githubusercontent.com/lilkuzco-dev/mod-installer/main/mod
 
 Append ` --dry-run` to preview what would change without touching anything.
 
+Nothing changes when the list gains new kinds of mods: the manifest can include directly-hosted jars (like the group's own Vibranium mod) alongside Modrinth ones, and the same command installs and verifies everything.
+
 **Without Node**, download the standalone app from the [releases page](https://github.com/lilkuzco-dev/mod-installer/releases/latest): `mod-installer` for macOS (Apple Silicon) or `mod-installer.exe` for Windows x64. Just double-click it; the group's mod list is built in.
 
 > macOS blocks unsigned apps downloaded from the internet: the first time, right-click the file → Open → Open (or run `xattr -d com.apple.quarantine ./mod-installer`). On an Intel Mac, use the Node one-liner above instead — the binary is Apple Silicon only.
@@ -60,6 +62,22 @@ Note: the manifest is one list for everyone, so client-only mods in it (e.g. Sod
 - `mods` — Modrinth **slugs**: the last part of the mod page URL, e.g. `https://modrinth.com/mod/sodium` → `sodium`.
 
 You don't need to list dependencies (like Fabric API) — required dependencies are resolved and installed automatically.
+
+### Direct-URL mods (`extra_mods`)
+
+Mods that aren't on Modrinth (like our own [Vibranium](https://github.com/lilkuzco-dev/vibranium)) can be added via the optional `extra_mods` field, pointing at any directly-hosted jar — a GitHub release asset is perfect:
+
+```json
+"extra_mods": [
+  {
+    "filename": "vibranium-1.0.0.jar",
+    "url": "https://github.com/lilkuzco-dev/vibranium/releases/download/v1.0.0/vibranium-1.0.0.jar",
+    "sha512": "9ee43238a4a9…"
+  }
+]
+```
+
+They join the same install set as the Modrinth mods: identical full-sync semantics (kept when hash-verified, replaced when changed, removed when dropped from the manifest) and the same mandatory SHA-512 verification — compute the hash with `shasum -a 512 the-mod.jar`. Two caveats: no dependency resolution for these (list any deps in the Modrinth `mods` array), and installer versions before 1.1.0 ignore the field (and will remove those jars on sync), so make sure everyone updates.
 
 ## Flags
 

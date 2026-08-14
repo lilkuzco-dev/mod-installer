@@ -12,7 +12,7 @@ const path = require("node:path");
 const { Readable } = require("node:stream");
 const { pipeline } = require("node:stream/promises");
 
-const VERSION = "1.0.0";
+const VERSION = "1.1.0";
 const API = "https://api.modrinth.com/v2";
 const USER_AGENT = `mod-installer/${VERSION} (friend-group Minecraft mod sync; Node.js CLI)`;
 const DOWNLOAD_CONCURRENCY = 3;
@@ -37,7 +37,9 @@ Options:
   -h, --help     Show this help
 
 Manifest format:
-  { "minecraft": "1.21.1", "loader": "fabric", "mods": ["fabric-api", "sodium"] }`;
+  { "minecraft": "1.21.1", "loader": "fabric", "mods": ["fabric-api", "sodium"] }
+  Optionally "extra_mods": directly-hosted jars, synced and verified like the rest:
+  [{ "filename": "my-mod.jar", "url": "https://...", "sha512": "<128 hex chars>" }]`;
 
 function fail(message) {
   console.error(`Error: ${message}`);
@@ -152,6 +154,21 @@ async function loadManifest(source) {
   }
   manifest.loader = manifest.loader.toLowerCase();
   manifest.mods = [...new Set(manifest.mods)];
+  if (manifest.extra_mods === undefined) {
+    manifest.extra_mods = [];
+  } else {
+    if (!Array.isArray(manifest.extra_mods)) throw new Error(`Manifest "extra_mods" must be an array`);
+    for (const [i, extra] of manifest.extra_mods.entries()) {
+      const where = `Manifest extra_mods[${i}]`;
+      if (typeof extra !== "object" || extra === null) throw new Error(`${where} must be an object`);
+      if (typeof extra.url !== "string" || !/^https?:\/\//i.test(extra.url)) throw new Error(`${where}.url must be an http(s) URL`);
+      if (typeof extra.sha512 !== "string" || !/^[0-9a-f]{128}$/i.test(extra.sha512)) throw new Error(`${where}.sha512 must be 128 hex characters`);
+      if (typeof extra.filename !== "string" || !extra.filename.toLowerCase().endsWith(".jar") || /[/\\]/.test(extra.filename)) {
+        throw new Error(`${where}.filename must be a bare .jar filename (no directories)`);
+      }
+      extra.sha512 = extra.sha512.toLowerCase();
+    }
+  }
   return { manifest, label };
 }
 
@@ -229,14 +246,36 @@ async function resolveInstallSet(manifest) {
   }
 
   for (const slug of manifest.mods) await resolveOne(slug, null);
+  return [...resolved.values()];
+}
 
+// Direct-URL jars from "extra_mods": same sync/verify semantics, no dependency
+// resolution (the manifest's Modrinth list is assumed to cover any deps).
+function extraModEntries(manifest) {
+  return manifest.extra_mods.map((extra) => {
+    console.log(`  ${extra.filename}  (direct URL)`);
+    return {
+      projectId: null,
+      slug: extra.filename,
+      title: extra.filename,
+      versionNumber: "",
+      filename: extra.filename,
+      url: extra.url,
+      sha512: extra.sha512,
+      size: 0, // unknown until downloaded
+      requiredBy: null,
+      direct: true,
+    };
+  });
+}
+
+function checkFilenameCollisions(entries) {
   const byFilename = new Map();
-  for (const entry of resolved.values()) {
+  for (const entry of entries) {
     const clash = byFilename.get(entry.filename);
     if (clash) throw new Error(`Filename collision: "${entry.filename}" comes from both ${clash.title} and ${entry.title}`);
     byFilename.set(entry.filename, entry);
   }
-  return [...resolved.values()];
 }
 
 function sha512File(filePath) {
@@ -351,16 +390,23 @@ async function main() {
   console.log(`\nResolving versions and dependencies on Modrinth...`);
   const entries = await resolveInstallSet(manifest);
   const depCount = entries.filter((e) => e.requiredBy).length;
-  console.log(`Install set: ${entries.length} mod(s)${depCount ? ` (${depCount} pulled in as dependencies)` : ""}`);
+  entries.push(...extraModEntries(manifest));
+  checkFilenameCollisions(entries);
+  const notes = [
+    depCount ? `${depCount} pulled in as dependencies` : "",
+    manifest.extra_mods.length ? `${manifest.extra_mods.length} direct-URL` : "",
+  ].filter(Boolean).join(", ");
+  console.log(`Install set: ${entries.length} mod(s)${notes ? ` (${notes})` : ""}`);
 
   const modsDir = path.resolve(opts.dir ?? defaultModsDir());
   console.log(`\nMods folder: ${modsDir}`);
   const plan = await buildPlan(modsDir, entries);
 
   console.log(`Plan: ${plan.adds.length} to add, ${plan.keeps.length} to keep, ${plan.replaces.length} to replace, ${plan.removes.length} to remove${opts.noRemove && plan.removes.length ? " (skipped: --no-remove)" : ""}`);
-  for (const e of plan.adds) console.log(`  + add      ${e.filename}  (${e.title} ${e.versionNumber}, ${fmtSize(e.size)})`);
+  const describe = (e) => (e.direct ? "direct URL" : `${e.title} ${e.versionNumber}`);
+  for (const e of plan.adds) console.log(`  + add      ${e.filename}  (${describe(e)}${e.size ? `, ${fmtSize(e.size)}` : ""})`);
   for (const e of plan.replaces) console.log(`  ~ replace  ${e.filename}  (on disk but hash differs; will re-download)`);
-  for (const e of plan.keeps) console.log(`  = keep     ${e.filename}  (${e.title} ${e.versionNumber}, hash verified)`);
+  for (const e of plan.keeps) console.log(`  = keep     ${e.filename}  (${describe(e)}, hash verified)`);
   for (const name of plan.removes) console.log(`  - remove   ${name}${opts.noRemove ? "  (kept: --no-remove)" : ""}`);
 
   if (opts.dryRun) {
@@ -387,7 +433,8 @@ async function main() {
 
   if (downloads.length > 0) {
     const totalSize = downloads.reduce((sum, e) => sum + e.size, 0);
-    console.log(`Downloading ${downloads.length} file(s), ${fmtSize(totalSize)} total...`);
+    const sizeNote = downloads.every((e) => e.size > 0) ? `, ${fmtSize(totalSize)} total` : "";
+    console.log(`Downloading ${downloads.length} file(s)${sizeNote}...`);
     await runPool(downloads, DOWNLOAD_CONCURRENCY, async (entry) => {
       await downloadVerified(entry, modsDir);
       console.log(`  + ${entry.filename}  (SHA-512 verified)`);
