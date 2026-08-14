@@ -1,12 +1,16 @@
 {
   "minecraft": "26.2",
   "loader": "fabric",
-  "mods": ["fabric-api", "lithium", "sodium"],
+  "mods": [
+    "fabric-api",
+    "lithium",
+    "sodium"
+  ],
   "extra_mods": [
     {
-      "filename": "vibranium-1.1.0.jar",
-      "url": "https://github.com/lilkuzco-dev/vibranium/releases/download/v1.1.0/vibranium-1.1.0.jar",
-      "sha512": "f8a9634ceea03d8ec26976e0113608da6bcf91fcede6cf91d220d9cbe75c8ddb6142380e477871ef3cd5f74e560f488f2d73b21cd132990ed91a754bd15e3b7d"
+      "filename": "vibranium-1.1.1.jar",
+      "url": "https://github.com/lilkuzco-dev/vibranium/releases/download/v1.1.1/vibranium-1.1.1.jar",
+      "sha512": "d367b154ab64d5fa3199e47c5c96a6f4f5bec4e8df60884416cc6f1ef7785e3ab48b93f09507083e4a385f686cd34bf9ed7b1dbe6372952666c5e013769d3ce3"
     }
   ]
 }

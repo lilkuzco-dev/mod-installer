@@ -70,9 +70,9 @@ Mods that aren't on Modrinth (like our own [Vibranium](https://github.com/lilkuz
 ```json
 "extra_mods": [
   {
-    "filename": "vibranium-1.1.0.jar",
-    "url": "https://github.com/lilkuzco-dev/vibranium/releases/download/v1.1.0/vibranium-1.1.0.jar",
-    "sha512": "f8a9634ceea0…"
+    "filename": "vibranium-1.1.1.jar",
+    "url": "https://github.com/lilkuzco-dev/vibranium/releases/download/v1.1.1/vibranium-1.1.1.jar",
+    "sha512": "d367b154ab64…"
   }
 ]
 ```
