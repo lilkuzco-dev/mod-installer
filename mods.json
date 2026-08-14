@@ -8,9 +8,9 @@
   ],
   "extra_mods": [
     {
-      "filename": "vibranium-1.1.1.jar",
-      "url": "https://github.com/lilkuzco-dev/vibranium/releases/download/v1.1.1/vibranium-1.1.1.jar",
-      "sha512": "d367b154ab64d5fa3199e47c5c96a6f4f5bec4e8df60884416cc6f1ef7785e3ab48b93f09507083e4a385f686cd34bf9ed7b1dbe6372952666c5e013769d3ce3"
+      "filename": "vibranium-1.2.0.jar",
+      "url": "https://github.com/lilkuzco-dev/vibranium/releases/download/v1.2.0/vibranium-1.2.0.jar",
+      "sha512": "bd7643ff74ec2e7fea2ac0054e09a579dbabeb8376360077e90eb4bcd9269506ce2e6dac564ce04598c7a721eac609751afe0306e15400f1e23ae29983fe20cf"
     }
   ]
 }
