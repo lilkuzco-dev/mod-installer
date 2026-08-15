@@ -16,6 +16,11 @@
       "filename": "warfront-0.1.0.jar",
       "url": "https://github.com/lilkuzco-dev/warfront/releases/download/v0.1.0/warfront-0.1.0.jar",
       "sha512": "b134600fc06da0693298cc9c47e4c017c2cb9f2428341fd78d3807b9d51012652a758386e3206484fdf5611e1ababbd170bd91752e8d2abc89506b447243b22b"
+    },
+    {
+      "filename": "menagerie-0.1.0.jar",
+      "url": "https://github.com/lilkuzco-dev/menagerie/releases/download/v0.1.0/menagerie-0.1.0.jar",
+      "sha512": "b9d2e8faa82e69b1fb3be008c108e92427271987417a85881169e8e08bbab88fed18a530513743a54291ce4b344aab3672deafb5927e0721c958b57d95a1edd4"
     }
   ]
 }
