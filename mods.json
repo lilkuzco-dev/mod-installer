@@ -137,6 +137,34 @@
     {
       "slug": "carpet",
       "side": "server"
+    },
+    {
+      "slug": "sparsestructures",
+      "side": "server"
+    },
+    {
+      "slug": "terralith",
+      "side": "server"
+    },
+    {
+      "slug": "towns-and-towers",
+      "side": "server"
+    },
+    {
+      "slug": "repurposed-structures-fabric",
+      "side": "server"
+    },
+    {
+      "slug": "friends-and-foes",
+      "side": "both"
+    },
+    {
+      "slug": "illager-invasion",
+      "side": "both"
+    },
+    {
+      "slug": "chunky",
+      "side": "server"
     }
   ],
   "extra_mods": [

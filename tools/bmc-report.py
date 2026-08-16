@@ -12,7 +12,23 @@ av = [r for r in res if r["status"] == "AVAILABLE_26.2"]
 # Modrinth reports optional/optional for mods that run independently on either
 # side, which cannot be turned into a manifest tag mechanically. These are my
 # calls, marked with a dagger in the tables.
-DO_NOT_ADOPT = {"magnum-torch"}
+DO_NOT_ADOPT = {
+    "magnum-torch": (
+        "**Permanently rejected — mechanical conflict.** It suppresses all natural mob spawning in a "
+        "large radius around the placed block. That is precisely the mechanic menagerie's territory "
+        "system is built on, so a Magnum Torch silently voids territory behaviour for every chunk in "
+        "range — with no error, no log line, and no obvious cause. The failure mode is invisible, which "
+        "is what makes it worse than an outright crash. Screens as `AVAILABLE_26.2` and reads like a "
+        "harmless QoL torch; it is not. Ruled out by Jesse 2026-08-16."
+    ),
+    "biomes-o-plenty": (
+        "**Permanently excluded — a choice, not a conflict.** Ruled out in favor of **Terralith**, which "
+        "is the empire's worldgen. BoP is a perfectly good mod and screens clean on 26.2; it is simply "
+        "not the one we are building the world on, and running both would mean two biome sources "
+        "competing over the same terrain. Do not re-propose it on availability grounds — availability "
+        "was never the question. Ruled by Jesse 2026-08-16."
+    ),
+}
 
 # ratified by Jesse 2026-08-16, not derived from Modrinth
 OFFLIST_SIDE = {"krypton": "both", "bobby": "client",
@@ -170,10 +186,10 @@ W("| Wave | State |")
 W("|---|---|")
 W("| Wave 1 — perf (12) | ✅ **adopted** 2026-08-16, in `mods.json` with side tags |")
 W("| Wave 2 — QoL (14) | ✅ **adopted** 2026-08-16, in `mods.json` with side tags |")
-W("| Wave 3 — worldgen/structures (4) | ⏸️ **ON HOLD** — waits for fresh-world day + the Terralith-vs-BoP ruling |")
+W("| Wave 3 — worldgen/structures (7) | ✅ **shipped** 2026-08-16 — Terralith ruling settled; `serene-seasons` held back |")
 W("| Off-list additions (4) | ✅ **adopted** 2026-08-16, separate follow-up commit |")
 W("")
-W("`sparsestructures` leading Wave 3 is ratified. Everything in the conflict table stays out until explicitly approved.")
+W("**Terralith is the empire's worldgen.** Wave 3 shipped as: `sparsestructures` (the spacing lever, leading), `terralith`, `towns-and-towers`, `repurposed-structures-fabric`, `chunky` (ops pre-generation) all **server**-tagged, plus `friends-and-foes` and `illager-invasion` as **both** — clients must render their mobs. `serene-seasons` is held pending a separate post-launch ruling. Everything else in the conflict table stays out until explicitly approved.")
 W("")
 
 # ---- reconciliation
@@ -290,7 +306,10 @@ W("**Do not re-import these in any future pass, regardless of how well they scre
 W("")
 W("| Mod | Slug | Ruling |")
 W("|---|---|---|")
-W("| Magnum Torch | `magnum-torch` | **Permanently rejected.** It suppresses all natural mob spawning in a large radius around the placed block. That is precisely the mechanic menagerie's territory system is built on: menagerie's 8 animals claim and hold territory via natural spawn pressure, so a Magnum Torch silently voids territory behaviour for every chunk in range — with no error, no log line, and no obvious cause. The failure mode is invisible, which is what makes it worse than an outright crash. Screens as `AVAILABLE_26.2` and looks like a harmless QoL torch; it is not. Ruled out by Jesse 2026-08-16. |")
+for _slug, _ruling in DO_NOT_ADOPT.items():
+    _r = by_slug.get(_slug) or eq_by_slug.get(_slug)
+    _title = _r["modrinthTitle"] if _r else _slug
+    W(f"| {_title} | `{_slug}` | {_ruling} |")
 W("")
 W("## ⚠️ Conflict flags — need your explicit approval")
 W("")
