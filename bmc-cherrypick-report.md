@@ -120,7 +120,7 @@ The **side** column is the manifest tag to use. It is derived from Modrinth's `c
 
 | Mod | Category | Slug | Side | Why |
 |---|---|---|---|---|
-| Just Enough Items (JEI) | qol | `jei` | **client†** | Recipe/usage lookup — the baseline QoL mod. |
+| Just Enough Items (JEI) | qol | `jei` | ~~client†~~ → **both** | Recipe/usage lookup — the baseline QoL mod. **Revised 2026-08-16 by live evidence:** the client warns JEI is not installed server-side. The server half syncs exact recipes rather than letting the client infer them. The original `client†` was a judgment call, and it was wrong. |
 | Jade 🔍 | qol | `jade` | **both†** | Look-at block/entity HUD; will surface menagerie diet/territory data. |
 | Xaero's Minimap | qol | `xaeros-minimap` | **client†** | Minimap. |
 | Xaero's World Map | qol | `xaeros-world-map` | **client†** | Full world map; pairs with the minimap. |
@@ -315,7 +315,7 @@ Sorted by downloads. Everything adoptable today, shortlisted or not.
 | Xaero's World Map | qol | `xaeros-world-map` | client† | `fabric-26.2-1.44.2` |
 | [EMF] Entity Model Features | qol | `entity-model-features` | client | `3.2.6-fabric-26.2` |
 | Not Enough Animations | content | `not-enough-animations` | client | `1.12.4` |
-| Just Enough Items (JEI) | qol | `jei` | client† | `30.24.0.165` |
+| Just Enough Items (JEI) | qol | `jei` | ~~client†~~ → **both** | `30.24.0.165` |
 | Continuity | qol | `continuity` | client | `3.0.1+26.2` |
 | Geckolib | qol | `geckolib` | client† | `5.5.3` |
 | Jade 🔍 | qol | `jade` | both† | `26.2.11+fabric` |
