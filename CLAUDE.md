@@ -69,7 +69,29 @@ When changing the report, patch the generator and **assert your anchor strings m
 before writing. A `str.replace` that finds nothing is a silent no-op, which is a
 postship-check-class bug: it reports success while changing nothing.
 
-## 5. No OS automation
+## 5. Shipping: hashes matching is not the same as mods starting
+
+`tools/postship-check.sh` runs a **load-compatibility gate** as its final step, and a ship is
+not done until it passes. Every jar's own `fabric.mod.json` — including the nested jars mods
+bundle under `META-INF/jars/` — is read, and every declared `depends` must be satisfied by
+something else in the manifest. `breaks` is checked too.
+
+*Why:* on 2026-08-16 `postship-check` passed on a manifest that shipped `kinetics 0.1.1`
+alongside a `cosmos` declaring `"kinetics": ">=0.1.2"`. Every hash was exactly what the manifest
+said it should be, so all three existing steps were satisfied. **The mod set was still one every
+client would refuse to start.** Hash integrity and load compatibility are different properties
+and shipping needs both.
+
+This applies to **every empire mod, not just cosmos**. The same failure arrives when vibranium
+starts depending on warfront, or when a Modrinth mod's new version quietly raises its Fabric API
+floor. It is the manifest that is wrong in every case, and the manifest is what the gate reads.
+
+- Run it standalone as `node tools/load-check.js [--dir <mods>] [--side client|server|all]`.
+- **The server mirror must run it too**, with `--side server`, before a deploy is considered
+  good — including the world reset. This repo does not own `deploy-server.sh` (rule 4), so that
+  wiring belongs to the session that does; the tool is here and takes `--side`.
+
+## 6. No OS automation
 
 No AppleScript, no `osascript`, no System Events, no synthetic keystrokes, no window
 focusing. Jesse launches Minecraft clients himself. For status, print to stdout.

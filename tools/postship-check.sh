@@ -6,7 +6,15 @@
 #   1. runs the installer sync,
 #   2. re-runs it --dry-run and requires "Already in sync",
 #   3. independently re-hashes every extra_mods jar against the manifest sha512,
+#   4. verifies the mod set can actually LOAD — every declared dependency in every
+#      jar satisfied by something else in the manifest,
 # and exits nonzero with a loud mismatch table on any divergence.
+#
+# Step 4 exists because steps 1-3 all passed on a manifest that shipped kinetics
+# 0.1.1 beside a cosmos declaring "kinetics": ">=0.1.2". Every hash was exactly
+# what the manifest said. The mod set still would not have started. Hash integrity
+# and load compatibility are different properties and shipping needs both — and
+# this applies to every empire mod, not just the one that exposed the hole.
 #
 # Usage: tools/postship-check.sh [manifest-url-or-path] [--dir <mods-dir>]
 # All arguments pass through to mod-installer.js; defaults match the installer
@@ -108,6 +116,22 @@ if (failed) {
   console.error("\n!! POSTSHIP CHECK FAILED — mods folder diverges from manifest name+version+sha512");
   process.exit(1);
 }
-console.log("\npostship-check: PASS — mods folder matches the manifest");
+console.log("\npostship-check: sha512 diff clean");
 NODEEOF
-exit $?
+SHA_EXIT=$?
+if [ $SHA_EXIT -ne 0 ]; then
+  exit $SHA_EXIT
+fi
+
+echo ""
+echo "== postship-check: load compatibility =="
+if ! node "$ROOT/tools/load-check.js" "$@"; then
+  echo ""
+  echo "!! POSTSHIP CHECK FAILED — the manifest is internally consistent but the mod" >&2
+  echo "!! set would not load. Hashes matching is not the same as mods starting." >&2
+  exit 1
+fi
+
+echo ""
+echo "postship-check: PASS — mods folder matches the manifest and the set will load"
+exit 0
