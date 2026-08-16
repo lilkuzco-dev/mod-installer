@@ -193,9 +193,9 @@
       "side": "both"
     },
     {
-      "filename": "lilkuzco-kinetics-0.1.0.jar",
-      "url": "https://github.com/lilkuzco-dev/lilkuzco_kinetics/releases/download/v0.1.0/lilkuzco-kinetics-0.1.0.jar",
-      "sha512": "4f73a5d1ee0e93ecaafba0d1c34eecb69185cceb08d11a53e32b1093b8307206e5afde15b30860db22862435e1b176672bb5876c8d984b6d9ca37437501f076a",
+      "filename": "lilkuzco-kinetics-0.1.1.jar",
+      "url": "https://github.com/lilkuzco-dev/lilkuzco_kinetics/releases/download/v0.1.1/lilkuzco-kinetics-0.1.1.jar",
+      "sha512": "94fc1affe052a839d66095ad73cd426923dd63e0bd201ed683e81f01d9be526f1755f4d59a0766bd3ec870d7556bd04761b671779e3a33af543f1a7a694bfc06",
       "side": "both"
     }
   ]
