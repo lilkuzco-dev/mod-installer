@@ -27,6 +27,24 @@ release + manifest push, run `tools/postship-check.sh` — it syncs, verifies th
 converges, and re-hashes every direct-URL jar against the manifest. **Ship is not done
 when the release is live; ship is done when postship-check passes.**
 
+### Server deploy is part of the ritual
+
+Since the Empire server exists, `postship-check.sh` is no longer the last step. A
+release is shipped when the server is *running* it and parity proves it:
+
+1. `tools/postship-check.sh` → green
+2. `./deploy-server.sh` → `DEPLOY GREEN`
+3. the parity line reads `PARITY GREEN`
+
+`deploy-server.sh` (in the `mc-server` working directory, not this repo) re-resolves
+the manifest from a **clean, pushed** tree, exact-mirrors it to the server's `/mods`,
+restarts via the panel API, verifies the boot log, and then compares the remote
+folder against the resolved set by filename **and** size. Any mismatch exits nonzero.
+
+The same reasoning as the original rule: the v0.2.0 incident happened because a
+machine was running a jar nobody had synced. A server nobody redeployed is that
+same failure with more players attached.
+
 ## Running from a checkout
 
 ```sh
