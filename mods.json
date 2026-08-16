@@ -187,9 +187,9 @@
       "side": "both"
     },
     {
-      "filename": "crude_empire-0.1.0.jar",
-      "url": "https://github.com/lilkuzco-dev/crude-empire/releases/download/v0.1.0/crude_empire-0.1.0.jar",
-      "sha512": "400c8895431251dc47ae552c4a37cc64c29a66962e1887af67cc8fbf68d5a85f16c53607484dbd4d1886169a6a1a08b33154e80543a7593c2e02e6f34a3908f1",
+      "filename": "crude_empire-0.1.1.jar",
+      "url": "https://github.com/lilkuzco-dev/crude-empire/releases/download/v0.1.1/crude_empire-0.1.1.jar",
+      "sha512": "aaace74edcd7045d958860f1f67e37e18df895105e5246bcaaca2660aa1539cd3e10a69cb354685e6c3b4abb90deb9f436723f28ef68fe965df4aa20f1d479fa",
       "side": "both"
     }
   ]
