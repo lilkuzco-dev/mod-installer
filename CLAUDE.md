@@ -88,7 +88,7 @@ floor. It is the manifest that is wrong in every case, and the manifest is what 
 
 - Run it standalone as `node tools/load-check.js [--dir <mods>] [--side client|server|all]`.
 - **The server mirror must run it too**, with `--side server`, before a deploy is considered
-  good — including the world reset. This repo does not own `deploy-server.sh` (rule 4), so that
+  good — including the world reset. This repo does not own `deploy-server.sh` (rule 3), so that
   wiring belongs to the session that does; the tool is here and takes `--side`.
 
 ## 6. No OS automation
