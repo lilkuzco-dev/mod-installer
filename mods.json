@@ -117,6 +117,22 @@
     {
       "slug": "neruina",
       "side": "both"
+    },
+    {
+      "slug": "krypton",
+      "side": "both"
+    },
+    {
+      "slug": "bobby",
+      "side": "client"
+    },
+    {
+      "slug": "sodium-extra",
+      "side": "client"
+    },
+    {
+      "slug": "reeses-sodium-options",
+      "side": "client"
     }
   ],
   "extra_mods": [

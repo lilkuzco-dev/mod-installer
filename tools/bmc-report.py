@@ -14,6 +14,10 @@ av = [r for r in res if r["status"] == "AVAILABLE_26.2"]
 # calls, marked with a dagger in the tables.
 DO_NOT_ADOPT = {"magnum-torch"}
 
+# ratified by Jesse 2026-08-16, not derived from Modrinth
+OFFLIST_SIDE = {"krypton": "both", "bobby": "client",
+                "sodium-extra": "client", "reeses-sodium-options": "client"}
+
 SIDE_CALL = {
     "jei": "client",        # recipe UI; nothing to do on a headless server
     "jade": "both",         # optional server half feeds live mob/block data
@@ -167,6 +171,7 @@ W("|---|---|")
 W("| Wave 1 — perf (12) | ✅ **adopted** 2026-08-16, in `mods.json` with side tags |")
 W("| Wave 2 — QoL (14) | ✅ **adopted** 2026-08-16, in `mods.json` with side tags |")
 W("| Wave 3 — worldgen/structures (4) | ⏸️ **ON HOLD** — waits for fresh-world day + the Terralith-vs-BoP ruling |")
+W("| Off-list additions (4) | ✅ **adopted** 2026-08-16, separate follow-up commit |")
 W("")
 W("`sparsestructures` leading Wave 3 is ratified. Everything in the conflict table stays out until explicitly approved.")
 W("")
@@ -269,13 +274,13 @@ W("Every Wave 3 entry is also in the conflict table below. This is the smallest 
 W("")
 W("### Off-list additions (not from BMC4)")
 W("")
-W("Screened because your manual pass wanted them or they fill an obvious gap. Not counted against the 30.")
+W("✅ **Adopted 2026-08-16** as a follow-up commit, separate from the BMC waves so provenance stays clean — these are *not* Better MC picks. Screened because the manual pass wanted them or they fill an obvious gap. Not counted against the 30.")
 W("")
 W("| Mod | Category | Slug | Side | Why |")
 W("|---|---|---|---|---|")
 for slug, r, why in OFFLIST:
     if r:
-        W(f"| {r['modrinthTitle']} | {bucket(r)} | `{r['modrinthSlug']}` | **{side_md(r)}** | {why} |")
+        W(f"| {r['modrinthTitle']} | {bucket(r)} | `{r['modrinthSlug']}` | **{OFFLIST_SIDE[r['modrinthSlug']]}** | {why} |")
 W("")
 
 # ---- conflicts
