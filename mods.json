@@ -191,6 +191,12 @@
       "url": "https://github.com/lilkuzco-dev/crude-empire/releases/download/v0.1.1/crude_empire-0.1.1.jar",
       "sha512": "aaace74edcd7045d958860f1f67e37e18df895105e5246bcaaca2660aa1539cd3e10a69cb354685e6c3b4abb90deb9f436723f28ef68fe965df4aa20f1d479fa",
       "side": "both"
+    },
+    {
+      "filename": "lilkuzco-kinetics-0.1.0.jar",
+      "url": "https://github.com/lilkuzco-dev/lilkuzco_kinetics/releases/download/v0.1.0/lilkuzco-kinetics-0.1.0.jar",
+      "sha512": "4f73a5d1ee0e93ecaafba0d1c34eecb69185cceb08d11a53e32b1093b8307206e5afde15b30860db22862435e1b176672bb5876c8d984b6d9ca37437501f076a",
+      "side": "both"
     }
   ]
 }
