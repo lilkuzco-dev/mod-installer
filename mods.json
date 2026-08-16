@@ -133,6 +133,10 @@
     {
       "slug": "reeses-sodium-options",
       "side": "client"
+    },
+    {
+      "slug": "carpet",
+      "side": "server"
     }
   ],
   "extra_mods": [
