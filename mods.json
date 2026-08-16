@@ -18,9 +18,9 @@
       "sha512": "f7d5391f8e328f40fb79bfe32ddff1a73e5b4a70a0142c20b16e43b620af0ab29ab618a6931c681afc632dd48baf06e5278fbdbddd4de29c24570bedbd1db7fd"
     },
     {
-      "filename": "menagerie-0.2.0.jar",
-      "url": "https://github.com/lilkuzco-dev/menagerie/releases/download/v0.2.0/menagerie-0.2.0.jar",
-      "sha512": "3c1da998fbf12f864948e5e90406639574bdb6bebec44732c4f939bf17fc203187320ccef9808fa1b1a28a4627f731b2604bc718d80afac7ab1e15c53e1cc29b"
+      "filename": "menagerie-0.3.0.jar",
+      "url": "https://github.com/lilkuzco-dev/menagerie/releases/download/v0.3.0/menagerie-0.3.0.jar",
+      "sha512": "468a818edb913373aee2dc0a26602b2d2cbbce742c1b4fa89a67df5ce27456fa68ec6f405b242c13530d24fac13b9ab55a5b3ae7d6241b05b077c3d445d9ed6a"
     }
   ]
 }
