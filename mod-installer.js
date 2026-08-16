@@ -12,7 +12,7 @@ const path = require("node:path");
 const { Readable } = require("node:stream");
 const { pipeline } = require("node:stream/promises");
 
-const VERSION = "1.1.1";
+const VERSION = "1.2.0";
 const API = "https://api.modrinth.com/v2";
 const USER_AGENT = `mod-installer/${VERSION} (friend-group Minecraft mod sync; Node.js CLI)`;
 const DOWNLOAD_CONCURRENCY = 3;
@@ -31,6 +31,9 @@ Usage:
 Options:
   --dir <path>   Mods folder to sync (default: the auto-detected .minecraft/mods
                  for this OS). Point this at your server's mods folder for servers.
+  --side <which> Which side to install for: client (default), server, or all.
+                 Entries tagged "both" always install; "client"/"server" entries
+                 install only for their own side. "all" ignores the tags.
   --dry-run      Show what would be added/kept/removed without changing anything
   --no-remove    Add and update mods, but never delete jars that aren't in the manifest
   --version      Print the version and exit
@@ -38,21 +41,43 @@ Options:
 
 Manifest format:
   { "minecraft": "1.21.1", "loader": "fabric", "mods": ["fabric-api", "sodium"] }
-  Optionally "extra_mods": directly-hosted jars, synced and verified like the rest:
-  [{ "filename": "my-mod.jar", "url": "https://...", "sha512": "<128 hex chars>" }]`;
+  A "mods" entry is either a bare Modrinth slug (side defaults to "both") or an
+  object tagging the side it belongs on:
+  { "slug": "sodium", "side": "client" }        // client | server | both
+  Optionally "extra_mods": directly-hosted jars, synced and verified like the rest,
+  and side-taggable the same way:
+  [{ "filename": "my-mod.jar", "url": "https://...", "sha512": "<128 hex chars>",
+     "side": "both" }]
+
+Servers:
+  mod-installer --dir /srv/mc/mods --side server`;
 
 function fail(message) {
   console.error(`Error: ${message}`);
   process.exit(1);
 }
 
+// Side tags a manifest entry may carry, and the filters --side accepts. They are
+// deliberately different sets: "both" describes an entry, "all" describes a sync.
+const ENTRY_SIDES = new Set(["client", "server", "both"]);
+const SIDE_FILTERS = new Set(["client", "server", "all"]);
+
+// An entry installs when the sync wants everything, when the entry belongs on
+// both sides, or when it is tagged for exactly the side being synced.
+const sideMatches = (entrySide, filter) => filter === "all" || entrySide === "both" || entrySide === filter;
+
 function parseArgs(argv) {
-  const opts = { manifest: null, dir: null, dryRun: false, noRemove: false };
+  const opts = { manifest: null, dir: null, dryRun: false, noRemove: false, side: "client" };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--dir") {
       opts.dir = argv[++i];
       if (!opts.dir) fail("--dir requires a path");
+    } else if (arg === "--side") {
+      const value = argv[++i];
+      if (!value) fail("--side requires one of: client, server, all");
+      opts.side = value.toLowerCase();
+      if (!SIDE_FILTERS.has(opts.side)) fail(`--side must be one of: client, server, all (got "${value}")`);
     } else if (arg === "--dry-run") opts.dryRun = true;
     else if (arg === "--no-remove") opts.noRemove = true;
     else if (arg === "--version") {
@@ -116,6 +141,48 @@ async function api(route) {
   return res.json();
 }
 
+// A "mods" entry is either a bare slug (v1.1 manifests, and anything that simply
+// belongs on both sides) or an object carrying an explicit side tag. Both shapes
+// normalize to { slug, side } so the rest of the installer only sees one form.
+function normalizeModEntry(raw, where) {
+  if (typeof raw === "string") {
+    if (!raw) throw new Error(`${where} must be a non-empty Modrinth slug`);
+    return { slug: raw, side: "both" };
+  }
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
+    throw new Error(`${where} must be a Modrinth slug string or a { "slug", "side" } object`);
+  }
+  if (typeof raw.slug !== "string" || !raw.slug) {
+    throw new Error(`${where}.slug must be a non-empty Modrinth slug`);
+  }
+  return { slug: raw.slug, side: normalizeSide(raw.side, where) };
+}
+
+function normalizeSide(side, where) {
+  if (side === undefined) return "both";
+  if (typeof side !== "string" || !ENTRY_SIDES.has(side.toLowerCase())) {
+    throw new Error(`${where}.side must be "client", "server", or "both" (got ${JSON.stringify(side)})`);
+  }
+  return side.toLowerCase();
+}
+
+// Duplicate slugs are harmless when they agree; when they disagree the manifest
+// is ambiguous about where the mod belongs, and guessing would silently install
+// (or skip) it on a side someone did not intend.
+function dedupeModEntries(entries) {
+  const bySlug = new Map();
+  for (const entry of entries) {
+    const seen = bySlug.get(entry.slug);
+    if (!seen) bySlug.set(entry.slug, entry);
+    else if (seen.side !== entry.side) {
+      throw new Error(
+        `Manifest lists "${entry.slug}" more than once with conflicting sides ("${seen.side}" and "${entry.side}")`,
+      );
+    }
+  }
+  return [...bySlug.values()];
+}
+
 async function loadManifest(source) {
   let text;
   let label;
@@ -149,11 +216,13 @@ async function loadManifest(source) {
   if (typeof manifest.loader !== "string" || !manifest.loader) {
     throw new Error(`Manifest is missing "loader" (e.g. "fabric")`);
   }
-  if (!Array.isArray(manifest.mods) || manifest.mods.length === 0 || !manifest.mods.every((m) => typeof m === "string" && m)) {
-    throw new Error(`Manifest "mods" must be a non-empty array of Modrinth slugs`);
+  if (!Array.isArray(manifest.mods) || manifest.mods.length === 0) {
+    throw new Error(`Manifest "mods" must be a non-empty array of Modrinth slugs or { "slug", "side" } entries`);
   }
   manifest.loader = manifest.loader.toLowerCase();
-  manifest.mods = [...new Set(manifest.mods)];
+  manifest.mods = dedupeModEntries(
+    manifest.mods.map((entry, i) => normalizeModEntry(entry, `Manifest mods[${i}]`)),
+  );
   if (manifest.extra_mods === undefined) {
     manifest.extra_mods = [];
   } else {
@@ -167,6 +236,7 @@ async function loadManifest(source) {
         throw new Error(`${where}.filename must be a bare .jar filename (no directories)`);
       }
       extra.sha512 = extra.sha512.toLowerCase();
+      extra.side = normalizeSide(extra.side, where);
     }
   }
   return { manifest, label };
@@ -175,7 +245,10 @@ async function loadManifest(source) {
 // Resolve every manifest slug plus all transitive "required" dependencies into a
 // flat install set, deduped by Modrinth project id. Sequential on purpose — a
 // friend-group mod list is small and this keeps us polite to the API.
-async function resolveInstallSet(manifest) {
+// modEntries is the side-filtered subset of manifest.mods; dependencies inherit
+// their parent's side implicitly, since a filtered-out root is never resolved
+// and so never pulls its libraries in.
+async function resolveInstallSet(manifest, modEntries) {
   const filter =
     `?game_versions=${encodeURIComponent(JSON.stringify([manifest.minecraft]))}` +
     `&loaders=${encodeURIComponent(JSON.stringify([manifest.loader]))}`;
@@ -245,14 +318,14 @@ async function resolveInstallSet(manifest) {
     }
   }
 
-  for (const slug of manifest.mods) await resolveOne(slug, null);
+  for (const entry of modEntries) await resolveOne(entry.slug, null);
   return [...resolved.values()];
 }
 
 // Direct-URL jars from "extra_mods": same sync/verify semantics, no dependency
 // resolution (the manifest's Modrinth list is assumed to cover any deps).
-function extraModEntries(manifest) {
-  return manifest.extra_mods.map((extra) => {
+function extraModEntries(extras) {
+  return extras.map((extra) => {
     console.log(`  ${extra.filename}  (direct URL)`);
     return {
       projectId: null,
@@ -386,15 +459,27 @@ async function main() {
 
   const { manifest, label } = await loadManifest(opts.manifest ?? BAKED_MANIFEST_URL);
   console.log(`Manifest: ${label}`);
+  const selectedMods = manifest.mods.filter((m) => sideMatches(m.side, opts.side));
+  const selectedExtras = manifest.extra_mods.filter((e) => sideMatches(e.side, opts.side));
+  const skipped = manifest.mods.length + manifest.extra_mods.length - selectedMods.length - selectedExtras.length;
+
   console.log(`Target:   Minecraft ${manifest.minecraft} / ${manifest.loader} — ${manifest.mods.length} mod(s) listed`);
+  console.log(`Side:     ${opts.side}${skipped ? ` — ${skipped} entr${skipped === 1 ? "y" : "ies"} tagged for the other side, skipped` : ""}`);
+
+  // Without this guard an all-other-side manifest would resolve to an empty
+  // install set, and the sync would read that as "remove every jar".
+  if (selectedMods.length + selectedExtras.length === 0) {
+    throw new Error(`No mods match --side ${opts.side} — every manifest entry is tagged for the other side`);
+  }
+
   console.log(`\nResolving versions and dependencies on Modrinth...`);
-  const entries = await resolveInstallSet(manifest);
+  const entries = await resolveInstallSet(manifest, selectedMods);
   const depCount = entries.filter((e) => e.requiredBy).length;
-  entries.push(...extraModEntries(manifest));
+  entries.push(...extraModEntries(selectedExtras));
   checkFilenameCollisions(entries);
   const notes = [
     depCount ? `${depCount} pulled in as dependencies` : "",
-    manifest.extra_mods.length ? `${manifest.extra_mods.length} direct-URL` : "",
+    selectedExtras.length ? `${selectedExtras.length} direct-URL` : "",
   ].filter(Boolean).join(", ");
   console.log(`Install set: ${entries.length} mod(s)${notes ? ` (${notes})` : ""}`);
 

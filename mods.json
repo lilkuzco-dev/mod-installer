@@ -2,25 +2,37 @@
   "minecraft": "26.2",
   "loader": "fabric",
   "mods": [
-    "fabric-api",
-    "lithium",
-    "sodium"
+    {
+      "slug": "fabric-api",
+      "side": "both"
+    },
+    {
+      "slug": "lithium",
+      "side": "both"
+    },
+    {
+      "slug": "sodium",
+      "side": "client"
+    }
   ],
   "extra_mods": [
     {
       "filename": "vibranium-1.6.0.jar",
       "url": "https://github.com/lilkuzco-dev/vibranium/releases/download/v1.6.0/vibranium-1.6.0.jar",
-      "sha512": "5421f13a2471c95ecfb585714d5919d9763e4064d7b72a9bd7c6ecf517df8a278196ce4b0232622cdaa58105fa61abddd230ce2751350b5fecd29dd74d1ed3c6"
+      "sha512": "5421f13a2471c95ecfb585714d5919d9763e4064d7b72a9bd7c6ecf517df8a278196ce4b0232622cdaa58105fa61abddd230ce2751350b5fecd29dd74d1ed3c6",
+      "side": "both"
     },
     {
       "filename": "warfront-0.2.1.jar",
       "url": "https://github.com/lilkuzco-dev/warfront/releases/download/v0.2.1/warfront-0.2.1.jar",
-      "sha512": "3124ae909da9287a70820d18d47d3b1e4838c39d7a1cb905953a23e4df015f84c2779da559dec297be8f2e164189b8af37954b3a22801c2a3766475e4265d242"
+      "sha512": "3124ae909da9287a70820d18d47d3b1e4838c39d7a1cb905953a23e4df015f84c2779da559dec297be8f2e164189b8af37954b3a22801c2a3766475e4265d242",
+      "side": "both"
     },
     {
       "filename": "menagerie-0.4.0.jar",
       "url": "https://github.com/lilkuzco-dev/menagerie/releases/download/v0.4.0/menagerie-0.4.0.jar",
-      "sha512": "d59cf97927cedaddb81349e41f38d1585978b69faf7f11ce9624260c8de35f7bbedc712d9197b501d84a45ab90b4e3c74c1de8394be8a4097055faae46abf2a9"
+      "sha512": "d59cf97927cedaddb81349e41f38d1585978b69faf7f11ce9624260c8de35f7bbedc712d9197b501d84a45ab90b4e3c74c1de8394be8a4097055faae46abf2a9",
+      "side": "both"
     }
   ]
 }

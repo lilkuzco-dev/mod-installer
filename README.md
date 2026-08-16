@@ -46,13 +46,15 @@ You can also pass a manifest URL or a path to a local manifest file as the first
 
 ## Server usage
 
-Point `--dir` directly at the server's mods folder:
+Point `--dir` at the server's mods folder and add `--side server`:
 
 ```sh
-node mod-installer.js --dir /srv/minecraft/mods https://raw.githubusercontent.com/lilkuzco-dev/mod-installer/main/mods.json
+node mod-installer.js --dir /srv/minecraft/mods --side server https://raw.githubusercontent.com/lilkuzco-dev/mod-installer/main/mods.json
 ```
 
-Note: the manifest is one list for everyone, so client-only mods in it (e.g. Sodium) will also be installed on the server. Fabric servers simply ignore client-only mods at launch, but if you'd rather keep the server lean, maintain a second, smaller manifest for it.
+`--side server` installs only the entries tagged `server` or `both`, so client-only mods
+like Sodium never land on the server. One manifest still serves everyone — see
+[side tags](#side-tags) below.
 
 ## The manifest
 
@@ -69,6 +71,32 @@ Note: the manifest is one list for everyone, so client-only mods in it (e.g. Sod
 - `mods` — Modrinth **slugs**: the last part of the mod page URL, e.g. `https://modrinth.com/mod/sodium` → `sodium`.
 
 You don't need to list dependencies (like Fabric API) — required dependencies are resolved and installed automatically.
+
+### Side tags
+
+A `mods` entry can also be an object saying which side the mod belongs on, so the same
+manifest can drive both the clients and the dedicated server:
+
+```json
+"mods": [
+  { "slug": "fabric-api", "side": "both" },
+  { "slug": "lithium",    "side": "both" },
+  { "slug": "sodium",     "side": "client" }
+]
+```
+
+- `side` is `client`, `server`, or `both`; it defaults to `both`, so a bare `"sodium"` string still works exactly as before.
+- `--side client` (the default) installs `client` + `both` entries.
+- `--side server` installs `server` + `both` entries.
+- `--side all` ignores the tags and installs everything.
+
+`extra_mods` entries take the same optional `side` field. Dependencies inherit their
+parent's side: a `server`-only mod's libraries are never resolved during a client sync.
+
+> **Updating from 1.1.x:** installers before 1.2.0 reject object-form `mods` entries with
+> `Manifest "mods" must be a non-empty array of Modrinth slugs`. Once the shared manifest
+> uses side tags, everyone needs the 1.2.0 script or binary. The failure is loud and
+> changes nothing on disk, so an out-of-date friend gets an error rather than a bad sync.
 
 ### Direct-URL mods (`extra_mods`)
 
@@ -91,6 +119,7 @@ They join the same install set as the Modrinth mods: identical full-sync semanti
 | Flag | Effect |
 |------|--------|
 | `--dir <path>` | Sync this mods folder instead of the auto-detected one |
+| `--side <which>` | `client` (default), `server`, or `all` — which side's entries to install |
 | `--dry-run` | Print planned adds/keeps/removes; change nothing |
 | `--no-remove` | Add and update mods, but never delete jars not in the manifest |
 | `--version` | Print the version and exit |
