@@ -13,6 +13,110 @@
     {
       "slug": "sodium",
       "side": "client"
+    },
+    {
+      "slug": "ferrite-core",
+      "side": "both"
+    },
+    {
+      "slug": "entityculling",
+      "side": "client"
+    },
+    {
+      "slug": "immediatelyfast",
+      "side": "client"
+    },
+    {
+      "slug": "badoptimizations",
+      "side": "client"
+    },
+    {
+      "slug": "ixeris",
+      "side": "client"
+    },
+    {
+      "slug": "particle-core",
+      "side": "client"
+    },
+    {
+      "slug": "gnetum",
+      "side": "client"
+    },
+    {
+      "slug": "fast-item-frames",
+      "side": "both"
+    },
+    {
+      "slug": "packet-fixer",
+      "side": "both"
+    },
+    {
+      "slug": "alternate-current",
+      "side": "server"
+    },
+    {
+      "slug": "structure-layout-optimizer",
+      "side": "server"
+    },
+    {
+      "slug": "spark",
+      "side": "both"
+    },
+    {
+      "slug": "jei",
+      "side": "client"
+    },
+    {
+      "slug": "jade",
+      "side": "both"
+    },
+    {
+      "slug": "xaeros-minimap",
+      "side": "client"
+    },
+    {
+      "slug": "xaeros-world-map",
+      "side": "client"
+    },
+    {
+      "slug": "clumps",
+      "side": "both"
+    },
+    {
+      "slug": "controlling",
+      "side": "client"
+    },
+    {
+      "slug": "mouse-tweaks",
+      "side": "client"
+    },
+    {
+      "slug": "clientsort",
+      "side": "client"
+    },
+    {
+      "slug": "sound-physics-remastered",
+      "side": "client"
+    },
+    {
+      "slug": "enchantment-descriptions",
+      "side": "client"
+    },
+    {
+      "slug": "not-enough-animations",
+      "side": "client"
+    },
+    {
+      "slug": "chat-heads",
+      "side": "client"
+    },
+    {
+      "slug": "just-zoom",
+      "side": "client"
+    },
+    {
+      "slug": "neruina",
+      "side": "both"
     }
   ],
   "extra_mods": [
