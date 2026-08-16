@@ -20,6 +20,13 @@ Nothing changes when the list gains new kinds of mods: the manifest can include 
 
 > macOS blocks unsigned apps downloaded from the internet: the first time, right-click the file → Open → Open (or run `xattr -d com.apple.quarantine ./mod-installer`). On an Intel Mac, use the Node one-liner above instead — the binary is Apple Silicon only.
 
+## Shipping a mod update
+
+The full convention lives in [SHIPPING.md](SHIPPING.md). The short version: after any
+release + manifest push, run `tools/postship-check.sh` — it syncs, verifies the folder
+converges, and re-hashes every direct-URL jar against the manifest. **Ship is not done
+when the release is live; ship is done when postship-check passes.**
+
 ## Running from a checkout
 
 ```sh

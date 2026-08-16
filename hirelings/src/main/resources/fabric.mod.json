@@ -1,0 +1,26 @@
+{
+	"schemaVersion": 1,
+	"id": "hirelings",
+	"version": "${version}",
+	"name": "Hirelings",
+	"description": "Hire persistent workers to mine, farm, fish, and hunt for you.",
+	"authors": [
+		"lilkuzco-dev"
+	],
+	"license": "CC0-1.0",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dev.lilkuzco.hirelings.Hirelings"
+		],
+		"client": [
+			"dev.lilkuzco.hirelings.client.HirelingsClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}

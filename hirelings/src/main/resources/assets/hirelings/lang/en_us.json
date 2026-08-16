@@ -1,0 +1,19 @@
+{
+	"entity.hirelings.worker": "Worker",
+	"item.hirelings.help_wanted_notice": "Help Wanted Notice",
+	"item.hirelings.help_wanted_notice.tooltip.1": "Place to call an available worker.",
+	"item.hirelings.help_wanted_notice.tooltip.2": "The worker still requires 8 emeralds to hire.",
+	"message.hirelings.hired": "You hired %s.",
+	"message.hirelings.hired_help": "Assign work with a pickaxe, hoe, fishing rod, or weapon. Use a clock to return the worker to idle.",
+	"message.hirelings.cost": "This worker asks for %s emeralds.",
+	"message.hirelings.not_owner": "This worker is employed by someone else.",
+	"message.hirelings.assigned": "Assigned as %s. Work center: %s.",
+	"message.hirelings.status": "Job: %s | Carrying: %s items | Work center: %s",
+	"message.hirelings.collected": "Collected %s items from the worker.",
+	"message.hirelings.notice_used": "An available worker answered your notice.",
+	"message.hirelings.notice_blocked": "The worker needs two clear blocks above the placement spot.",
+	"command.hirelings.status": "You have %s loaded worker(s).",
+	"command.hirelings.status_line": "%s — %s, carrying %s items, at %s",
+	"command.hirelings.recalled": "Recalled %s loaded worker(s).",
+	"command.hirelings.summoned": "Summoned an available worker."
+}
