@@ -134,3 +134,38 @@ Corollaries:
   which happen exactly once — never in `setRemoved`, which also fires on unload.
 - Prefer **epoch-recompute over accumulation** wherever the maths allows it. State that cannot
   drift cannot drift while you are not looking.
+
+## 8. Another session's uncommitted work: never absorb, never stash
+
+Several sessions share this working tree. You **will** find changes in it that are not
+yours — most often when manifest discipline (rule 3) blocks a deploy on a dirty tree and
+the dirty file is someone else's.
+
+**Commit it separately, attributed, and unmodified.** Then continue.
+
+```
+CLAUDE.md: unattended simulation runs on the server tick
+
+Doctrine section written by the cosmos session and left uncommitted in the
+working tree; committing it as its own change so it is not absorbed into an
+unrelated commit. Content is theirs and unmodified.
+```
+
+The two tempting shortcuts are both wrong:
+
+- **Absorbing it** — sweeping it into your own commit with `git add -A` or `git commit -a`.
+  It attributes their work to your change, and it buries an unrelated edit under a message
+  that does not describe it. Whoever runs `git log` later is misled, and the blame trail is
+  gone.
+- **Stashing it** — `git stash` to get a clean tree. It is silent, it is invisible to the
+  session that owns the work, and a stash nobody knows about is indistinguishable from lost
+  work. Never move another session's changes out of the tree to unblock yourself.
+
+Corollaries:
+- **Read the diff before you touch it.** Coherent, finished work gets committed. If it looks
+  genuinely mid-edit — half a function, a syntax error, a debug print — stop and ask rather
+  than committing something broken in their name.
+- Stage by explicit path (`git add tools/foo.sh`), never `-A` or `-a`. The habit is what
+  keeps absorption from happening by accident.
+- This is etiquette between agents, not a technicality. The other session cannot see what you
+  did to its tree, so the burden of being legible is entirely yours.

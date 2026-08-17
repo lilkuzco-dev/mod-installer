@@ -35,6 +35,12 @@ The script refuses to source any `deploy.env` found inside this repository, on
 the theory that a copy made "just to test something" is otherwise one `git add -A`
 away from a published host and key path — in a commit that would look routine.
 
+**The config shape is documented in `~/Desktop/mc-server/deploy.env.example`** —
+every key, with commentary, and no real values. It sits beside the real file
+rather than in this repo on purpose: versioning the shape is worth something, but
+not at the risk of a filled-in copy appearing here later, which is the same
+mistake the guard above exists to catch.
+
 ## The two deploy gates
 
 Worth knowing about, because they are what makes a `DEPLOY GREEN` mean anything:
