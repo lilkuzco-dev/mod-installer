@@ -100,3 +100,37 @@ macOS window-content screenshots additionally require Screen Recording permissio
 the terminal, which is **not** granted here — `screencapture` returns desktop wallpaper
 only, so it cannot serve as visual proof regardless. Prove things with logs: mod
 counts, init lines, mixin-failure counts, exit codes.
+
+## 7. Unattended simulation runs on the server tick — never on an entity or block-entity tick
+
+**Anything that must keep progressing while nobody is nearby MUST be driven by the server tick or
+recomputed from an epoch. It may never hang off `Entity.tick()` or `BlockEntity.serverTick()`.**
+
+Those methods do not run for unloaded chunks. A simulation attached to them does not fail loudly —
+it silently does nothing, and everything downstream reports success while producing no result.
+
+*Why:* this was learned **three separate times** in one campaign, each time costing a debugging
+session, each time looking like a different bug:
+
+1. **Rocket insertion** resolved from `RocketEntity.tick()`. A launch flown with nobody standing
+   nearby completed with no insertion, no failure message and no satellite. Kinetics had integrated
+   the whole flight from the service tick and the result was thrown away.
+2. **Capsule recovery** resolved from the capsule's tick. A capsule enters four kilometres from
+   where it lands, mostly over chunks nobody has loaded; the payload silently never dropped.
+3. **The lunar ISRU roster** was built from block-entity ticks. A player who built four
+   electrolysers at the pole and flew home found the base had produced nothing while they were
+   away — and `BlockEntity.setRemoved()` fires on chunk *unload* as well as on breaking a block, so
+   unregistering there shut the base down every time they walked out of range.
+
+The fixes all have the same shape and are the pattern to copy: `LaunchTracker`, `RecoveryTracker`
+and `LunarEconomyManager` all subscribe to `ServerTickEvents.END_SERVER_TICK`, and the orbital
+registry goes further by never accumulating at all — it propagates from an epoch, so an orbit is
+correct whether it was ticked or not.
+
+Corollaries:
+- Entities and block entities are **views**. If one never ticks, the only thing lost should be
+  visuals.
+- Register and unregister on **placement and removal** (`onPlace` / `affectNeighborsAfterRemoval`),
+  which happen exactly once — never in `setRemoved`, which also fires on unload.
+- Prefer **epoch-recompute over accumulation** wherever the maths allows it. State that cannot
+  drift cannot drift while you are not looking.
