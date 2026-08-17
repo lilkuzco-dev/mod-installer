@@ -211,6 +211,17 @@ Every Wave 3 entry is also in the conflict table below. This is the smallest set
 | Magnum Torch | `magnum-torch` | **Permanently rejected — mechanical conflict.** It suppresses all natural mob spawning in a large radius around the placed block. That is precisely the mechanic menagerie's territory system is built on, so a Magnum Torch silently voids territory behaviour for every chunk in range — with no error, no log line, and no obvious cause. The failure mode is invisible, which is what makes it worse than an outright crash. Screens as `AVAILABLE_26.2` and reads like a harmless QoL torch; it is not. Ruled out by Jesse 2026-08-16. |
 | Biomes O' Plenty | `biomes-o-plenty` | **Permanently excluded — a choice, not a conflict.** Ruled out in favor of **Terralith**, which is the empire's worldgen. BoP is a perfectly good mod and screens clean on 26.2; it is simply not the one we are building the world on, and running both would mean two biome sources competing over the same terrain. Do not re-propose it on availability grounds — availability was never the question. Ruled by Jesse 2026-08-16. |
 
+## ℹ️ Known benign warnings — expected, not defects
+
+Lines that appear on **every** launch and **every** `load-check` run, are understood, and should not be silenced by adding a mod. Recorded so a later pass does not spend a session rediscovering they are harmless — or 'fix' one by growing the manifest for a cosmetic reason.
+
+These are `recommends`, not `depends`. `load-check` prints them as `~` warnings and exits **0**; only an unsatisfied `depends` is an error.
+
+| Warning | Where | Verdict |
+|---|---|---|
+| `friendsandfoes` recommends `yet_another_config_lib_v3`, not present | client + server | **Benign — a `recommends`, not a `depends`.** Friends&Foes actually depends on `minecraft`, `fabricloader`, `fabric-api` and `resourcefullib`, every one of which the manifest ships. YACL is a config-*screen* library: without it the mod loads and behaves identically, and its settings are read from `config/friendsandfoes.json` rather than an in-game screen. Fabric prints this at startup and `load-check` repeats it; neither is an error, and the client has launched cleanly with YACL absent every time. Adopting YACL to quiet the line would add a mod to the manifest for a cosmetic reason. Confirmed against the jar's own `fabric.mod.json` 2026-08-17. |
+| `friendsandfoes` and `forgeconfigapiport` recommend `modmenu`, not present | server only | **Benign, and structural.** `modmenu` is a client mod — it draws the in-game mod list — so it is tagged `client` in the manifest and correctly absent from a `--side server` sync. A headless server has no GUI for it to add to. The warning is `load-check` faithfully reporting a recommend that a server can never satisfy, not a gap in the server set. It does **not** appear on the client, where `modmenu` is installed. |
+
 ## ⚠️ Conflict flags — need your explicit approval
 
 Everything here is `AVAILABLE_26.2` and would otherwise be a reasonable pick. Each collides with one of our three mods. **None are in Waves 1 or 2.**

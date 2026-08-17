@@ -30,6 +30,35 @@ DO_NOT_ADOPT = {
     ),
 }
 
+# Warnings the toolchain emits on every run that are understood and correct to ignore.
+# Deliberately NOT in DO_NOT_ADOPT: that map holds Jesse's standing rulings against adopting
+# a mod, and none of these are rulings. The point here is narrower — the warning is not a
+# defect, so nobody needs to chase it or grow the manifest to silence it. Whether to adopt
+# any of these mods on their own merits stays an open question.
+BENIGN_WARNINGS = [
+    (
+        "`friendsandfoes` recommends `yet_another_config_lib_v3`, not present",
+        "client + server",
+        "**Benign — a `recommends`, not a `depends`.** Friends&Foes actually depends on "
+        "`minecraft`, `fabricloader`, `fabric-api` and `resourcefullib`, every one of which the "
+        "manifest ships. YACL is a config-*screen* library: without it the mod loads and behaves "
+        "identically, and its settings are read from `config/friendsandfoes.json` rather than an "
+        "in-game screen. Fabric prints this at startup and `load-check` repeats it; neither is an "
+        "error, and the client has launched cleanly with YACL absent every time. Adopting YACL to "
+        "quiet the line would add a mod to the manifest for a cosmetic reason. Confirmed against "
+        "the jar's own `fabric.mod.json` 2026-08-17.",
+    ),
+    (
+        "`friendsandfoes` and `forgeconfigapiport` recommend `modmenu`, not present",
+        "server only",
+        "**Benign, and structural.** `modmenu` is a client mod — it draws the in-game mod list — so "
+        "it is tagged `client` in the manifest and correctly absent from a `--side server` sync. A "
+        "headless server has no GUI for it to add to. The warning is `load-check` faithfully "
+        "reporting a recommend that a server can never satisfy, not a gap in the server set. It "
+        "does **not** appear on the client, where `modmenu` is installed.",
+    ),
+]
+
 # ratified by Jesse 2026-08-16, not derived from Modrinth
 OFFLIST_SIDE = {"krypton": "both", "bobby": "client",
                 "sodium-extra": "client", "reeses-sodium-options": "client"}
@@ -355,6 +384,17 @@ for _slug, _ruling in DO_NOT_ADOPT.items():
     _r = by_slug.get(_slug) or eq_by_slug.get(_slug)
     _title = _r["modrinthTitle"] if _r else _slug
     W(f"| {_title} | `{_slug}` | {_ruling} |")
+W("")
+W("## ℹ️ Known benign warnings — expected, not defects")
+W("")
+W("Lines that appear on **every** launch and **every** `load-check` run, are understood, and should not be silenced by adding a mod. Recorded so a later pass does not spend a session rediscovering they are harmless — or 'fix' one by growing the manifest for a cosmetic reason.")
+W("")
+W("These are `recommends`, not `depends`. `load-check` prints them as `~` warnings and exits **0**; only an unsatisfied `depends` is an error.")
+W("")
+W("| Warning | Where | Verdict |")
+W("|---|---|---|")
+for _warning, _where, _verdict in BENIGN_WARNINGS:
+    W(f"| {_warning} | {_where} | {_verdict} |")
 W("")
 W("## ⚠️ Conflict flags — need your explicit approval")
 W("")
