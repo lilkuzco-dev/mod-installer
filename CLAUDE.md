@@ -169,3 +169,43 @@ Corollaries:
   keeps absorption from happening by accident.
 - This is etiquette between agents, not a technicality. The other session cannot see what you
   did to its tree, so the burden of being legible is entirely yours.
+
+## 8b. Every mutation gets a commit or a claim — "done but uncommitted" is not an end state
+
+Rule 8 makes the collision survivable. This one makes it rare.
+
+**A session that finishes work commits it before yielding.** Leaving finished work sitting
+in the shared tree is not a neutral act: it is a landmine for whoever deploys next, because
+rule 3 blocks their deploy on your dirty tree and they must then adjudicate work they did
+not write.
+
+**If the work genuinely cannot be committed** — mid-edit, failing checks, a half-finished
+refactor — leave a **claim**: an untracked `WIP-<topic>.md` at the repo root saying what is
+in flight and which paths you own.
+
+```markdown
+# WIP — installer pre-flight gate
+Session: cosmos    Started: 2026-08-17
+Paths owned: mod-installer.js, build.js, tools/load-check.js
+State: analyzeJars extracted, callers not yet migrated — `node --check` fails on build.js
+Do not commit these on my behalf; stage around them.
+```
+
+The mechanism is chosen to fit the gate rather than fight it: `deploy-server.sh` **blocks**
+on modified tracked files but only **warns** on untracked ones, so a claim file is loud in
+`git status` and in every deploy's output, yet never blocks a ship.
+
+Corollaries:
+- **Do not gitignore `WIP-*.md`.** Ignored files do not appear as `??`, which would destroy
+  the entire point — the marker exists to be discovered.
+- A claim covers *broken* work. It is not a way to leave finished work uncommitted
+  indefinitely; that is the thing this rule exists to stop.
+- Delete your claim when you commit. A stale claim teaches the next session to ignore claims.
+- Encountering a claim: stage around the paths it names, by explicit path (rule 8). Do not
+  commit claimed work even if it looks finished — the owner said it is not.
+- Encountering uncommitted work with **no** claim: rule 8 applies. Read it, and if it is
+  coherent, commit it attributed.
+
+*Escalation:* if collisions keep happening with this in place, raise it rather than working
+around it — per-session git worktrees are the next step, and that machinery is deliberately
+not built until this cheaper fix proves insufficient.
