@@ -193,15 +193,15 @@
       "side": "both"
     },
     {
-      "filename": "lilkuzco-kinetics-0.1.3.jar",
-      "url": "https://github.com/lilkuzco-dev/lilkuzco_kinetics/releases/download/v0.1.3/lilkuzco-kinetics-0.1.3.jar",
-      "sha512": "639fdf811a832b580caca78344b19e91876cd7e18a91ace232f62e9be6303b6235295cadf55de505e5cbfc7aaff7fb71bf965871d1c4fc766773edaac828e8e1",
+      "filename": "lilkuzco-kinetics-0.1.4.jar",
+      "url": "https://github.com/lilkuzco-dev/lilkuzco_kinetics/releases/download/v0.1.4/lilkuzco-kinetics-0.1.4.jar",
+      "sha512": "825565a25c5efaae052e834ea98004e6544b5de64bdba6a81af7638ed2021a4ebfe4cab3a66d6a671f985fca773f6bfae2394d0932768b09612144060fc780c6",
       "side": "both"
     },
     {
-      "filename": "lilkuzco-cosmos-0.2.1.jar",
-      "url": "https://github.com/lilkuzco-dev/lilkuzco_cosmos/releases/download/v0.2.1/lilkuzco-cosmos-0.2.1.jar",
-      "sha512": "857b6865acce50ef29f543c8b9a1ae23b4abc3e8ada37315ee805502c01a27900a5f5b86f643984450c384b1f5af04fd7175cfe86dd81d67d5ced5edac41188b",
+      "filename": "lilkuzco-cosmos-0.2.2.jar",
+      "url": "https://github.com/lilkuzco-dev/lilkuzco_cosmos/releases/download/v0.2.2/lilkuzco-cosmos-0.2.2.jar",
+      "sha512": "161d29cf97341c38ccc66bd6934c8d160bb9126a2e9158503c7c4e1fb493736f0d2500358761241cffc2b132c3ca706ff3067c1b7a27bd99af0ca4312f646ccd",
       "side": "both"
     }
   ]

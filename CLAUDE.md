@@ -49,6 +49,15 @@ session pulls it directly and `--side server` consumes the side tags verbatim, s
 uncommitted tag change silently means one thing locally and another on the server.
 
 Corollaries:
+- **A released version is immutable.** Once a version is published, changing what that version
+  contains is forbidden — bump it instead. kinetics 0.1.3 was published, then had the outer moon's
+  constants committed into it without a bump, so `0.1.3` named two different artifacts. The manifest
+  shipped the one without them beside a cosmos that needed them, and **the load-compatibility gate
+  could not see it**: cosmos declared `kinetics >=0.1.3` and 0.1.3 was present. A version predicate
+  cannot catch a version that changed underneath it.
+- **Before claiming a set is good to go, rebuild from committed source and compare the hash to the
+  manifest.** That single check caught the above, and would have caught the earlier case where a
+  release was built from uncommitted source. Two different failures, one cheap test.
 - Ship is not done when the release is live; ship is done when `tools/postship-check.sh`
   passes. See `SHIPPING.md`.
 - Verify every `side` tag against Modrinth's `client_side`/`server_side` before
