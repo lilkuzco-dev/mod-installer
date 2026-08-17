@@ -209,3 +209,35 @@ Corollaries:
 *Escalation:* if collisions keep happening with this in place, raise it rather than working
 around it — per-session git worktrees are the next step, and that machinery is deliberately
 not built until this cheaper fix proves insufficient.
+
+## 9. Client-side changes ship only after the render battery's screenshots are read
+
+**For any change that draws something — a renderer, a model, a texture, a particle, a GUI — the
+client render battery is part of the ship ritual, and `postship-check` does not count as green
+until its screenshots have been looked at.**
+
+Run it with `./gradlew runGametest` in the mod's repo; frames land in
+`build/run-gametest/screenshots/`. **Read the images.** They are the evidence, and the whole point
+is that they are the only evidence that can catch this class of bug.
+
+*Why:* two cosmos releases passed **every** server-side check while visually broken.
+
+- `0.1.0-A` registered no entity renderer at all. `EntityRenderDispatcher` returns null for an
+  unregistered type and the render thread dereferences it, so launching a rocket was a **hard
+  client crash**. The server logged a perfect flight.
+- `0.1.0-D` fixed the crash with a renderer that drew nothing — correct as a crash fix — and
+  shipped a **completely invisible rocket** for a whole release. Physics right, satellite
+  deployed, logs clean, nothing to look at.
+
+Hashes matching is not the same as mods starting (rule 5); mods starting is not the same as
+anything being drawn.
+
+Corollaries:
+- **A texture writer that ignores the shape of its input is a coincidence, not a writer.** cosmos'
+  PNG generator hardcoded 16x16 and silently truncated two 64x64 entity sheets to their top-left
+  corner. Every block texture is 16x16, so nothing complained for months.
+- **Give any part that is hard to photograph a model board.** A parachute is deployed for the last
+  few seconds of a 4,000-block entry on an object ten pixels tall; verifying it from a real descent
+  took six runs and never produced a legible frame. `cosmos showcapsule` stands one up next to the
+  camera and answers "is this drawn" in seconds. Build the fast loop before spending hours on the
+  slow one.
