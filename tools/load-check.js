@@ -17,7 +17,13 @@
 //
 // Zero dependencies, CommonJS, Node 18+ — same constraints as the installer itself.
 //
-// Usage: node tools/load-check.js [--dir <mods-dir>] [--manifest <path>] [--side <name>] [--json]
+// Usage: node tools/load-check.js [--dir <mods-dir>] [--manifest <path>] [--side <name>]
+//                                 [--json] [--ids]
+//
+// --ids prints one top-level mod id per line and nothing else, so a deploy can ask "which mods
+// should this jar set produce?" and then check the server's boot log actually lists every one.
+// Nested jars are excluded: a bundled library is not something the loader announces separately
+// as a mod the deploy asked for.
 
 "use strict";
 
@@ -378,10 +384,12 @@ async function main() {
 	let manifestPath = "./mods.json";
 	let side = "all";
 	let asJson = false;
+	let asIds = false;
 
 	for (let i = 0; i < argv.length; i++) {
 		const arg = argv[i];
-		if (arg === "--dir") dir = argv[++i];
+		if (arg === "--ids") asIds = true;
+		else if (arg === "--dir") dir = argv[++i];
 		else if (arg === "--manifest") manifestPath = argv[++i];
 		else if (arg === "--side") side = argv[++i];
 		else if (arg === "--json") asJson = true;
@@ -410,6 +418,14 @@ async function main() {
 	for (const file of files) {
 		const buf = await fsp.readFile(path.join(dir, file));
 		collectMods(buf, file, into);
+	}
+
+	if (asIds) {
+		// Ids only, one per line, no framing — this output is consumed by a script.
+		for (const mod of into.mods) {
+			if (!mod.nested) console.log(mod.id);
+		}
+		process.exit(0);
 	}
 
 	const problems = check(into.mods, into.provided, side);
