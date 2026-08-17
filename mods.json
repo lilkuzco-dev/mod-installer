@@ -199,9 +199,9 @@
       "side": "both"
     },
     {
-      "filename": "lilkuzco-cosmos-0.1.0-B.jar",
-      "url": "https://github.com/lilkuzco-dev/lilkuzco_cosmos/releases/download/v0.1.0-B/lilkuzco-cosmos-0.1.0-B.jar",
-      "sha512": "57162759295eb0940bcfc7bd0801215abe14e22ad1f11b4fb3630d1bb4eead224a0874ea5767d68601194cf8f3e5f7c93c4e0338eea76e7e1169ab9f57c007e8",
+      "filename": "lilkuzco-cosmos-0.1.0-C.jar",
+      "url": "https://github.com/lilkuzco-dev/lilkuzco_cosmos/releases/download/v0.1.0-C/lilkuzco-cosmos-0.1.0-C.jar",
+      "sha512": "bf611d01b1d8e8fe5c2df65aa39811155c23c3a2dcd6d6614ba957276fa2ee0385687475e66dde31c5d5b9144b9c7472ea4b4af7d77054f008e67e437c6ec419",
       "side": "both"
     }
   ]
