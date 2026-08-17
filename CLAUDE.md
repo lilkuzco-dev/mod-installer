@@ -65,8 +65,11 @@ Corollaries:
   sides there is no mechanical answer — make the call explicitly and mark it, so it
   can be revised by live evidence later (this is how `jei` was corrected
   `client` → `both`).
-- This repo does **not** own server deploy tooling. A separate session owns
-  `deploy-server.sh` and the world reset. Keep the side tags correct and stop there.
+- **Superseded 2026-08-17:** this repo now *does* own the deploy tooling.
+  `tools/deploy-server.sh` lives here, versioned, and enforces this rule — it refuses to
+  deploy from a dirty tree. It reads its config from `~/Desktop/mc-server/deploy.env`,
+  outside version control, and refuses to source any `deploy.env` found inside the repo.
+  The world reset still belongs to the ops session; the *tool* it runs is this one.
 
 ## 4. Generated files: patch the generator, never the output
 
@@ -96,9 +99,10 @@ starts depending on warfront, or when a Modrinth mod's new version quietly raise
 floor. It is the manifest that is wrong in every case, and the manifest is what the gate reads.
 
 - Run it standalone as `node tools/load-check.js [--dir <mods>] [--side client|server|all]`.
-- **The server mirror must run it too**, with `--side server`, before a deploy is considered
-  good — including the world reset. This repo does not own `deploy-server.sh` (rule 3), so that
-  wiring belongs to the session that does; the tool is here and takes `--side`.
+- **The server mirror runs it too**, with `--side server`, before a deploy is considered
+  good — including the world reset. That wiring now exists: `tools/deploy-server.sh` step (a1)
+  runs it against the staged set *before a single byte is uploaded*, because the cheapest place
+  to catch "these mods will not boot together" is the machine doing the staging.
 
 ## 6. No OS automation
 

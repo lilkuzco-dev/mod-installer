@@ -253,6 +253,21 @@ if [ "$NO_RESTART" -eq 1 ]; then
 fi
 
 step "(c) Restarting server"
+
+# Fingerprint the CURRENT log before restarting, so step (d) can tell the new
+# boot's log from the one already sitting there. See the note in (d).
+#
+# The fingerprint is the log's FIRST LINE, not a hash of the file. A hash of the
+# whole file is worthless here: the outgoing server appends "Stopping server",
+# "Saving chunks" and friends while it shuts down, so the old log's hash changes
+# without a new boot having happened — which is precisely the false "it's fresh"
+# this guard exists to prevent. The first line is written once when the log is
+# created and never moves.
+prev_boot_fp=""
+if printf 'get %s %s\n' "$REMOTE_LOG_PATH" "$WORK/prev.log" | sftp_run >/dev/null 2>&1; then
+  prev_boot_fp=$( head -1 "$WORK/prev.log" 2>/dev/null || true )
+fi
+
 RESTARTED=0
 if [ -n "${BLOOM_API_KEY:-}" ]; then
   if [ -z "${PANEL_SERVER_ID:-}" ]; then
@@ -288,17 +303,35 @@ fi
 
 # ============================================== (d) BOOT + LOG VERIFICATION
 step "(d) Waiting for boot, then verifying mod init"
+# The log must be from the NEW boot, not the one that was already there.
+#
+# Waiting only for 'Done' is a stale-evidence bug: 15s after the restart signal
+# the server may still be shutting down, and latest.log still holds the PREVIOUS
+# boot — which contains its own 'Done'. The gate would accept it instantly and
+# then verify mod init against a boot that predates the deploy, reporting GREEN on
+# evidence that cannot show the new jars at all. That is the same class of failure
+# as the hardcoded mod list: a check that passes without covering what it guards.
+#
+# The window is real, not theoretical: shutdown is dominated by the world save, so
+# it grows with the world. On a throwaway world it fits inside 15s; on a pregenned
+# one it will not — which puts the failure squarely on the world-reset deploy, the
+# run where being wrong costs the most.
 deadline=$(( $(date +%s) + 300 ))
 booted=0
 while [ "$(date +%s)" -lt "$deadline" ]; do
   sleep 15
   if printf 'get %s %s\n' "$REMOTE_LOG_PATH" "$WORK/latest.log" | sftp_run >/dev/null 2>&1; then
+    cur_boot_fp=$( head -1 "$WORK/latest.log" 2>/dev/null || true )
+    if [ -n "$prev_boot_fp" ] && [ "$cur_boot_fp" = "$prev_boot_fp" ]; then
+      info "still shutting down (log is still the previous boot)..."
+      continue
+    fi
     if grep -q 'Done (.*)! For help' "$WORK/latest.log" 2>/dev/null; then booted=1; break; fi
   fi
   info "still booting..."
 done
-[ "$booted" -eq 1 ] || die "server did not report 'Done' within 300s — check panel console"
-ok "server booted"
+[ "$booted" -eq 1 ] || die "server did not report 'Done' from a NEW boot within 300s — check panel console"
+ok "server booted (log is from a new boot, not the previous one)"
 
 grep -q 'Done (.*)! For help' "$WORK/latest.log" && info "$(grep -o 'Done ([^)]*)' "$WORK/latest.log" | tail -1)"
 
