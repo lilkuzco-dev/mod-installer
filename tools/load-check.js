@@ -304,6 +304,32 @@ function environmentAllows(environment, side) {
 function check(mods, provided, side) {
 	const problems = [];
 
+	// Two top-level jars declaring the same mod id is a hard loader failure — Fabric will not
+	// pick a winner between them. It is also exactly what a stale jar looks like on disk: the
+	// new version arrives, the old one is still sitting there, and the folder now holds both.
+	// Worth catching first, because the symptom it otherwise produces is a *different* mod
+	// reported as depending on the wrong version, which sends you hunting the innocent party.
+	//
+	// Nested jars are exempt. Mods routinely bundle the same library and the loader is expected
+	// to dedupe those; flagging them would fail every set that ships more than one Fabric mod.
+	const topLevelById = new Map();
+	for (const mod of mods) {
+		if (mod.nested || !environmentAllows(mod.environment, side)) continue;
+		if (!topLevelById.has(mod.id)) topLevelById.set(mod.id, []);
+		topLevelById.get(mod.id).push(mod);
+	}
+	for (const [id, copies] of topLevelById) {
+		if (copies.length < 2) continue;
+		problems.push({
+			severity: "error",
+			mod: id,
+			file: copies.map((c) => c.file).join(", "),
+			detail: `is declared by ${copies.length} jars at once — `
+				+ copies.map((c) => `${c.file} (${c.version})`).join(" and ")
+				+ `. Fabric refuses to start with a duplicate mod id; remove the stale jar.`,
+		});
+	}
+
 	for (const mod of mods) {
 		// A client-only mod is not loaded on a server, so its dependencies are not a server
 		// problem. Checking it anyway would produce failures nobody can act on.
@@ -364,6 +390,34 @@ function check(mods, provided, side) {
 }
 
 // ---------------------------------------------------------------------------
+//  Library entry point
+// ---------------------------------------------------------------------------
+
+// The same check `main` runs over a directory, but driven by an explicit list of jar
+// paths. That difference is the whole point: the client sync needs to judge the folder it
+// is ABOUT to create — freshly downloaded jars still in staging, plus the ones already in
+// place that it intends to keep — and that set is not a directory anywhere on disk yet.
+// Checking a folder can only ever be a post-mortem; checking a set can be a pre-flight.
+async function analyzeJars(jarPaths, options = {}) {
+	const { manifest = null, side = "all" } = options;
+	const javaVersion = Number.parseInt(
+		options.javaVersion ?? process.env.LOAD_CHECK_JAVA ?? "25", 10);
+
+	const into = { mods: [], provided: platformProviders(manifest, javaVersion), malformed: [] };
+	for (const jarPath of jarPaths) {
+		collectMods(await fsp.readFile(jarPath), path.basename(jarPath), into);
+	}
+
+	const problems = check(into.mods, into.provided, side);
+	return {
+		mods: into.mods,
+		malformed: into.malformed,
+		errors: problems.filter((p) => p.severity === "error"),
+		warnings: problems.filter((p) => p.severity === "warning"),
+	};
+}
+
+// ---------------------------------------------------------------------------
 //  CLI
 // ---------------------------------------------------------------------------
 
@@ -412,36 +466,27 @@ async function main() {
 		process.exit(1);
 	}
 
-	const javaVersion = Number.parseInt(process.env.LOAD_CHECK_JAVA ?? "25", 10);
-	const into = { mods: [], provided: platformProviders(manifest, javaVersion), malformed: [] };
-
-	for (const file of files) {
-		const buf = await fsp.readFile(path.join(dir, file));
-		collectMods(buf, file, into);
-	}
+	const { mods, malformed, errors, warnings } =
+		await analyzeJars(files.map((f) => path.join(dir, f)), { manifest, side });
 
 	if (asIds) {
 		// Ids only, one per line, no framing — this output is consumed by a script.
-		for (const mod of into.mods) {
+		for (const mod of mods) {
 			if (!mod.nested) console.log(mod.id);
 		}
 		process.exit(0);
 	}
 
-	const problems = check(into.mods, into.provided, side);
-	const errors = problems.filter((p) => p.severity === "error");
-	const warnings = problems.filter((p) => p.severity === "warning");
-
 	if (asJson) {
-		console.log(JSON.stringify({ dir, side, mods: into.mods.length, errors, warnings }, null, 2));
+		console.log(JSON.stringify({ dir, side, mods: mods.length, errors, warnings }, null, 2));
 		process.exit(errors.length === 0 ? 0 : 1);
 	}
 
-	const topLevel = into.mods.filter((m) => !m.nested).length;
-	console.log(`load-check: ${topLevel} mods (+${into.mods.length - topLevel} bundled), `
+	const topLevel = mods.filter((m) => !m.nested).length;
+	console.log(`load-check: ${topLevel} mods (+${mods.length - topLevel} bundled), `
 		+ `side=${side}, minecraft=${manifest?.minecraft ?? "unknown"}`);
 
-	for (const bad of into.malformed) {
+	for (const bad of malformed) {
 		console.log(`  !! ${bad.file}: unreadable fabric.mod.json — ${bad.reason}`);
 	}
 	for (const warning of warnings) {
@@ -467,7 +512,22 @@ async function main() {
 	process.exit(1);
 }
 
-main().catch((error) => {
-	console.error(`load-check: ${error.stack ?? error.message}`);
-	process.exit(1);
-});
+// Run the CLI only when invoked directly. When this file is required as a module — which is
+// how the client sync's pre-flight gate reaches it, and how build.js folds it into the
+// standalone binary — it must define and export, never execute or call process.exit.
+if (require.main === module) {
+	main().catch((error) => {
+		console.error(`load-check: ${error.stack ?? error.message}`);
+		process.exit(1);
+	});
+}
+
+module.exports = {
+	analyzeJars,
+	collectMods,
+	platformProviders,
+	check,
+	parseVersion,
+	compareVersions,
+	satisfies,
+};

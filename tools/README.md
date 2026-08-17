@@ -7,7 +7,7 @@ dirty tree, so a change in this directory has to be committed before it can ship
 | | |
 |---|---|
 | `deploy-server.sh` | Deploys the manifest to the Empire server, then proves it worked |
-| `load-check.js` | Resolves declared dependencies across a set of jars; `--ids` lists top-level mod ids |
+| `load-check.js` | Resolves declared dependencies across a set of jars; `--ids` lists top-level mod ids. Also the library behind the installer's own pre-flight gate — `require()` it for `analyzeJars(paths, {manifest, side})` |
 | `postship-check.sh` | The ship gate — a release is not shipped until this passes |
 | `bmc-screen.js`, `bmc-report.py` | Big-Mod-Compendium cherry-pick screening |
 
@@ -48,6 +48,13 @@ Worth knowing about, because they are what makes a `DEPLOY GREEN` mean anything:
 - **(a1) load compatibility**, before a single byte is uploaded. Hash integrity
   and load compatibility are different properties: `postship-check` proves the
   folder matches the manifest, this proves the set would actually start.
+  `mod-installer.js` now runs the same check itself, over the set it is about to
+  write, on **every** sync — client and server alike, and inside the standalone
+  binary, which `build.js` inlines `load-check.js` into. So this step is belt and
+  braces rather than the only line of defence, and the client path a friend runs
+  has the same guarantee the deploy does: if the set would not start, nothing is
+  touched. Keep (a1) anyway — it gates the *staged* set that gets uploaded, which
+  is the thing the server will actually boot.
 - **(d) mod init**, after the restart. Every mod the manifest resolves for that
   side must appear in the boot log, and the expected list is *derived from the
   staged jars* rather than hardcoded. It reads each jar's own `fabric.mod.json`,

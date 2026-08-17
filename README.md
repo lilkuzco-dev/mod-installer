@@ -128,11 +128,13 @@ They join the same install set as the Modrinth mods: identical full-sync semanti
 ## What a sync does
 
 1. Resolves each slug to the newest **release-channel** Modrinth version matching your `minecraft` + `loader`, falling back to the newest beta, then alpha, only when no stable release exists (the output flags any non-release picks). Required dependencies are added recursively (deduped), with the same channel preference. Fails with a clear error naming the mod if no compatible version exists.
-2. Backs up your current mods folder to a sibling `mods-backup-<timestamp>/` before touching anything.
-3. Makes the folder match the resolved set exactly: downloads missing jars, keeps ones that already match (verified by SHA-512), re-downloads corrupted ones, and **removes jars not in the list** (unless `--no-remove` — use that if you keep personal local mods).
-4. Verifies every download against Modrinth's SHA-512 hash; retries once on mismatch, then fails loudly with a non-zero exit code.
+2. Downloads everything it needs into a sibling `mods-staging-<timestamp>/`, **outside** your mods folder, verifying each file against Modrinth's SHA-512 hash; retries once on mismatch, then fails loudly with a non-zero exit code.
+3. **Load check.** Reads every staged and kept jar's own `fabric.mod.json` — including the nested jars mods bundle under `META-INF/jars/` — and requires that every declared `depends` is satisfied by something else in the set, and that no declared `breaks` is present. If the set would not start, the sync stops here and **your mods folder is left exactly as it was**.
+4. Only then backs up your current mods folder to a sibling `mods-backup-<timestamp>/` and makes it match the resolved set exactly: moves the staged jars in, keeps ones that already match, and **removes jars not in the list** (unless `--no-remove` — use that if you keep personal local mods).
 
 Non-jar files and subfolders (configs, etc.) are never touched. If something goes wrong, copy your `mods-backup-*` folder back over `mods/`.
+
+Step 3 is why a bad manifest cannot reach you as a Fabric startup error. "Your folder matches the manifest" and "these mods will start together" are different properties — a set can be byte-perfect and still be one the loader refuses. The check runs even when the folder is already in sync, because that is exactly where a manifest that outgrew its own jars sits unnoticed until launch. `--dry-run` skips it: it reads the jars, which a dry run never downloads.
 
 ## Building the standalone binaries (for the list maintainer)
 

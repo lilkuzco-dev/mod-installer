@@ -25,14 +25,32 @@ const DIST = path.join(ROOT, "dist");
 const run = (cmd, args, opts = {}) => execFileSync(cmd, args, { stdio: "inherit", ...opts });
 const npx = process.platform === "win32" ? "npx.cmd" : "npx";
 
-function makeBlob() {
-  const source = fs.readFileSync(path.join(ROOT, "mod-installer.js"), "utf8");
-  const marker = "const BAKED_MANIFEST_URL = null;";
+// Fold tools/load-check.js into the entry script. A SEA carries one CommonJS file and
+// resolves no relative require(), so the gate has to travel as source. It is wrapped in
+// the CommonJS shape it already expects, which leaves `require.main === module` false
+// inside the wrapper — so the bundled copy exports and never runs its own CLI.
+function inlineLoadCheck() {
+  const source = fs.readFileSync(path.join(ROOT, "tools", "load-check.js"), "utf8")
+    .replace(/^#![^\n]*\n/, ""); // a shebang is a syntax error once this is a function body
+  if (!source.includes("module.exports")) {
+    throw new Error(`tools/load-check.js exports nothing — the bundled gate would be empty`);
+  }
+  return `(function () { const module = { exports: {} }; const exports = module.exports;\n${source}\nreturn module.exports; })()`;
+}
+
+// Every substitution is asserted before it is made. A str.replace that matches nothing is
+// a silent no-op: the build would succeed and ship a binary with no manifest URL baked in,
+// or — worse, because it fails invisibly — no load gate.
+function bake(source, marker, replacement) {
   if (!source.includes(marker)) throw new Error(`Marker line "${marker}" not found in mod-installer.js`);
-  fs.writeFileSync(
-    path.join(BUILD, "sea-entry.js"),
-    source.replace(marker, `const BAKED_MANIFEST_URL = ${JSON.stringify(MANIFEST_URL)};`),
-  );
+  return source.replace(marker, replacement);
+}
+
+function makeBlob() {
+  let source = fs.readFileSync(path.join(ROOT, "mod-installer.js"), "utf8");
+  source = bake(source, "const BAKED_MANIFEST_URL = null;", `const BAKED_MANIFEST_URL = ${JSON.stringify(MANIFEST_URL)};`);
+  source = bake(source, "const INLINED_LOAD_CHECK = null;", `const INLINED_LOAD_CHECK = ${inlineLoadCheck()};`);
+  fs.writeFileSync(path.join(BUILD, "sea-entry.js"), source);
   fs.writeFileSync(
     path.join(BUILD, "sea-config.json"),
     JSON.stringify({ main: "sea-entry.js", output: "sea-prep.blob", disableExperimentalSEAWarning: true }, null, 2) + "\n",
