@@ -215,6 +215,12 @@
       "url": "https://github.com/lilkuzco-dev/cruise-missile-program/releases/download/v0.2.0/cruise-missile-program-0.2.0.jar",
       "sha512": "aad815460282b438ff13d8df1784e6d7a366465c2ff638bbb3af7b05e962be8c5f7282ec4324f25b879f65008de65a67f3bc8d5cfd168d03697332119550407f",
       "side": "both"
+    },
+    {
+      "filename": "waldschatten-0.1.0.jar",
+      "url": "https://github.com/lilkuzco-dev/waldschatten/releases/download/v0.1.0/waldschatten-0.1.0.jar",
+      "sha512": "0a67bc26092a9b84a9c7f9d5d0f9bb72f83c2c8203d4a88a939ab7a760f0955a68d5370f82a5b0832b6389c1e3e13e3ce2c35ef7ac6480110267a73146a79123",
+      "side": "both"
     }
   ]
 }
