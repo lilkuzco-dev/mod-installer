@@ -5,7 +5,8 @@
 # the local mods folder provably matches the manifest. This script:
 #   1. runs the installer sync,
 #   2. re-runs it --dry-run and requires "Already in sync",
-#   3. independently re-hashes every extra_mods jar against the manifest sha512,
+#   3. independently re-hashes applicable extra_mods jars from the mods folder and other-side
+#      jars from their release URLs against the manifest sha512,
 #   4. verifies the mod set can actually LOAD — every declared dependency in every
 #      jar satisfied by something else in the manifest,
 # and exits nonzero with a loud mismatch table on any divergence.
@@ -53,70 +54,97 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
-// mirror the installer's defaults: ./mods.json, auto-detected .minecraft/mods
-const argv = process.argv.slice(2);
-let manifestArg = null, dir = null;
-for (let i = 0; i < argv.length; i++) {
-  if (argv[i] === "--dir") dir = argv[++i];
-  else if (!argv[i].startsWith("--") && !manifestArg) manifestArg = argv[i];
-}
-const manifestPath = manifestArg ?? "./mods.json";
-if (/^https?:/.test(manifestPath)) {
-  console.error("remote manifests: pass a local path for the sha512 diff step");
-  process.exit(1);
-}
-if (!dir) {
-  const home = os.homedir();
-  dir =
-    process.platform === "darwin" ? path.join(home, "Library", "Application Support", "minecraft", "mods")
-    : process.platform === "win32" ? path.join(process.env.APPDATA ?? path.join(home, "AppData", "Roaming"), ".minecraft", "mods")
-    : path.join(home, ".minecraft", "mods");
-}
+async function main() {
+  // Mirror the installer's defaults: ./mods.json, client side, auto-detected mods folder.
+  const argv = process.argv.slice(2);
+  let manifestArg = null, dir = null, side = "client";
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === "--dir") dir = argv[++i];
+    else if (argv[i] === "--side") side = argv[++i];
+    else if (!argv[i].startsWith("--") && !manifestArg) manifestArg = argv[i];
+  }
+  const manifestPath = manifestArg ?? "./mods.json";
+  if (/^https?:/.test(manifestPath)) {
+    console.error("remote manifests: pass a local path for the sha512 diff step");
+    process.exit(1);
+  }
+  if (!dir) {
+    const home = os.homedir();
+    dir =
+      process.platform === "darwin" ? path.join(home, "Library", "Application Support", "minecraft", "mods")
+      : process.platform === "win32" ? path.join(process.env.APPDATA ?? path.join(home, "AppData", "Roaming"), ".minecraft", "mods")
+      : path.join(home, ".minecraft", "mods");
+  }
 
-const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-const extras = manifest.extra_mods ?? [];
-const rows = [];
-let failed = false;
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+  const extras = manifest.extra_mods ?? [];
+  const rows = [];
+  let failed = false;
 
-for (const e of extras) {
-  const p = path.join(dir, e.filename);
-  let status, detail;
-  if (!fs.existsSync(p)) {
-    status = "MISSING"; detail = "file not in mods folder";
-    failed = true;
-  } else {
-    const actual = createHash("sha512").update(fs.readFileSync(p)).digest("hex");
-    if (actual === e.sha512) {
-      status = "OK"; detail = "sha512 " + actual.slice(0, 16) + "…";
+  for (const e of extras) {
+    const appliesHere = side === "all" || e.side === "both" || e.side === side;
+    let status, detail, actual;
+    if (appliesHere) {
+      const p = path.join(dir, e.filename);
+      if (!fs.existsSync(p)) {
+        status = "MISSING"; detail = `file not in ${side} mods folder`;
+        failed = true;
+      } else {
+        actual = createHash("sha512").update(fs.readFileSync(p)).digest("hex");
+      }
     } else {
-      status = "MISMATCH"; detail = `expected ${e.sha512.slice(0, 16)}… got ${actual.slice(0, 16)}…`;
+      try {
+        const response = await fetch(e.url, { redirect: "follow" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        actual = createHash("sha512")
+          .update(Buffer.from(await response.arrayBuffer())).digest("hex");
+        status = "REMOTE";
+      } catch (error) {
+        status = "FETCH"; detail = error.message;
+        failed = true;
+      }
+    }
+
+    if (actual) {
+      if (actual === e.sha512) {
+        status ??= "OK";
+        detail = "sha512 " + actual.slice(0, 16) + "…";
+      } else {
+        status = "MISMATCH";
+        detail = `expected ${e.sha512.slice(0, 16)}… got ${actual.slice(0, 16)}…`;
+        failed = true;
+      }
+    }
+    rows.push([e.filename, status, detail]);
+  }
+
+  // Stray direct-URL-looking jars that shadow a manifest mod under another version.
+  const extraNames = new Set(extras.map((e) => e.filename));
+  const stems = new Set(extras.map((e) => e.filename.replace(/-[\d].*$/, "")));
+  for (const f of fs.readdirSync(dir).filter((f) => f.endsWith(".jar"))) {
+    const stem = f.replace(/-[\d].*$/, "");
+    if (!extraNames.has(f) && stems.has(stem)) {
+      rows.push([f, "STRAY", "same mod, version not in manifest"]);
       failed = true;
     }
   }
-  rows.push([e.filename, status, detail]);
-}
 
-// stray direct-URL-looking jars that shadow a manifest mod under another version
-const extraNames = new Set(extras.map((e) => e.filename));
-const stems = new Set(extras.map((e) => e.filename.replace(/-[\d].*$/, "")));
-for (const f of fs.readdirSync(dir).filter((f) => f.endsWith(".jar"))) {
-  const stem = f.replace(/-[\d].*$/, "");
-  if (!extraNames.has(f) && stems.has(stem)) {
-    rows.push([f, "STRAY", "same mod, version not in manifest"]);
-    failed = true;
+  const w = Math.max(3, ...rows.map((r) => r[0].length));
+  console.log("JAR".padEnd(w) + "  " + "STATUS".padEnd(9) + "DETAIL");
+  console.log("-".repeat(w + 40));
+  for (const [n, s, d] of rows) console.log(n.padEnd(w) + "  " + s.padEnd(9) + d);
+
+  if (failed) {
+    console.error("\n!! POSTSHIP CHECK FAILED — active-side files or remote release assets diverge from the manifest");
+    process.exit(1);
   }
+  console.log("\npostship-check: sha512 diff clean");
 }
 
-const w = Math.max(3, ...rows.map((r) => r[0].length));
-console.log("JAR".padEnd(w) + "  " + "STATUS".padEnd(9) + "DETAIL");
-console.log("-".repeat(w + 40));
-for (const [n, s, d] of rows) console.log(n.padEnd(w) + "  " + s.padEnd(9) + d);
-
-if (failed) {
-  console.error("\n!! POSTSHIP CHECK FAILED — mods folder diverges from manifest name+version+sha512");
+main().catch((error) => {
+  console.error(error.stack ?? error.message);
   process.exit(1);
-}
-console.log("\npostship-check: sha512 diff clean");
+});
 NODEEOF
 SHA_EXIT=$?
 if [ $SHA_EXIT -ne 0 ]; then
