@@ -211,9 +211,9 @@
       "side": "both"
     },
     {
-      "filename": "cruise-missile-program-0.1.0.jar",
-      "url": "https://github.com/lilkuzco-dev/cruise-missile-program/releases/download/v0.1.0/cruise-missile-program-0.1.0.jar",
-      "sha512": "e40862c2ab62dc63e39dee9b6da9528130b9edb491b301dda68827a115c3fb01e8f9a3d1b474504429d609600860c71f984e26882e0e9bfa085672315cd20454",
+      "filename": "cruise-missile-program-0.2.0.jar",
+      "url": "https://github.com/lilkuzco-dev/cruise-missile-program/releases/download/v0.2.0/cruise-missile-program-0.2.0.jar",
+      "sha512": "aad815460282b438ff13d8df1784e6d7a366465c2ff638bbb3af7b05e962be8c5f7282ec4324f25b879f65008de65a67f3bc8d5cfd168d03697332119550407f",
       "side": "both"
     }
   ]
