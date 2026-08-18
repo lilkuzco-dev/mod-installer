@@ -35,6 +35,10 @@ The script refuses to source any `deploy.env` found inside this repository, on
 the theory that a copy made "just to test something" is otherwise one `git add -A`
 away from a published host and key path — in a commit that would look routine.
 
+One optional knob worth knowing: `MODS_BACKUP_KEEP` (default 5) caps how many
+`mods-backup-<stamp>/` snapshots the deploy keeps. The installer writes one per run
+at ~43 MB; nothing pruned them until 2026-08-17, by which point ten had accumulated.
+
 **The config shape is documented in `~/Desktop/mc-server/deploy.env.example`** —
 every key, with commentary, and no real values. It sits beside the real file
 rather than in this repo on purpose: versioning the shape is worth something, but

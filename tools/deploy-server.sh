@@ -160,6 +160,45 @@ shopt -u nullglob
   || die "staging resolved to ZERO jars — GUARD 2 tripped, nothing remote was touched"
 ok "staging holds ${#staged_jars[@]} jar(s)"
 
+# ------------------------------------------------- (a2) BACKUP RETENTION
+# The installer snapshots the mods folder on every run, ~43 MB a time, and nothing
+# ever removed them: ten deploys had accumulated 346 MB beside the runbook. Keep the
+# recent ones — they are the rollback path — and drop the rest. Every snapshot is
+# re-resolvable from mods.json history anyway, so the deep tail buys nothing.
+#
+# This is the only place this script deletes anything local, so it is deliberately
+# narrow. It matches the installer's exact `mods-backup-YYYYMMDD-HHMMSS` shape and
+# nothing else, touches directories only, and prints every removal. A glob alone
+# would be too wide — `mods-backup-*` would happily match a directory someone had
+# renamed to park it, which is exactly the kind of "obviously fine" pattern match
+# that rule 1 exists to forbid.
+MODS_BACKUP_KEEP="${MODS_BACKUP_KEEP:-5}"
+backup_root="$( dirname "$STAGING_DIR" )"
+if [ "$MODS_BACKUP_KEEP" -gt 0 ] 2>/dev/null && [ -d "$backup_root" ] && [ "$backup_root" != "/" ]; then
+  # Read with a while loop, not `mapfile` — macOS ships bash 3.2, where mapfile
+  # does not exist and the script would die here at runtime.
+  all_backups=()
+  while IFS= read -r d; do
+    [ -n "$d" ] && all_backups+=("$d")
+  done < <(
+    find "$backup_root" -maxdepth 1 -type d -name 'mods-backup-*' 2>/dev/null \
+      | grep -E '/mods-backup-[0-9]{8}-[0-9]{6}$' | sort -r
+  )
+  if [ "${#all_backups[@]}" -gt "$MODS_BACKUP_KEEP" ]; then
+    pruned=0; freed_from="${#all_backups[@]}"
+    for old in "${all_backups[@]:$MODS_BACKUP_KEEP}"; do
+      # Belt and braces: re-assert the path is inside the root and still matches
+      # the exact shape before anything is removed.
+      case "$old" in
+        "$backup_root"/mods-backup-*) ;;
+        *) warn "skipping unexpected path: $old"; continue ;;
+      esac
+      rm -rf "$old" && pruned=$(( pruned + 1 ))
+    done
+    ok "pruned $pruned old mods-backup dir(s), kept newest $MODS_BACKUP_KEEP of $freed_from"
+  fi
+fi
+
 # ------------------------------------------------- (a1) LOAD COMPATIBILITY
 # Hash integrity and load compatibility are different properties. postship-check
 # proves the folder matches the manifest; this proves the set would actually
