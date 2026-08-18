@@ -227,6 +227,12 @@
       "url": "https://github.com/lilkuzco-dev/waldschatten/releases/download/v0.1.0/waldschatten-0.1.0.jar",
       "sha512": "0a67bc26092a9b84a9c7f9d5d0f9bb72f83c2c8203d4a88a939ab7a760f0955a68d5370f82a5b0832b6389c1e3e13e3ce2c35ef7ac6480110267a73146a79123",
       "side": "both"
+    },
+    {
+      "filename": "empire_worldgen-0.1.0.jar",
+      "url": "https://github.com/lilkuzco-dev/empire-worldgen/releases/download/v0.1.0/empire_worldgen-0.1.0.jar",
+      "sha512": "bf85432377dba9a81bffb3750be0850dc15c8753b5fbe73818e3319dec90833daf41b1b01c562edadf5fefb07e4efe60f7d334b100a59e3552a3af003582b72d",
+      "side": "server"
     }
   ]
 }
