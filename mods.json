@@ -209,6 +209,12 @@
       "url": "https://github.com/lilkuzco-dev/lilkuzco_cosmos/releases/download/v0.2.3/lilkuzco-cosmos-0.2.3.jar",
       "sha512": "25dae4520f6b1748288a0e2bb0b9383203151ea1085ee43a2661823c6043a031c62b3057a349a19ab20f0423572da467a54c38cccd9d881db643b0c3c7316c10",
       "side": "both"
+    },
+    {
+      "filename": "cruise-missile-program-0.1.0.jar",
+      "url": "https://github.com/lilkuzco-dev/cruise-missile-program/releases/download/v0.1.0/cruise-missile-program-0.1.0.jar",
+      "sha512": "e40862c2ab62dc63e39dee9b6da9528130b9edb491b301dda68827a115c3fb01e8f9a3d1b474504429d609600860c71f984e26882e0e9bfa085672315cd20454",
+      "side": "both"
     }
   ]
 }
