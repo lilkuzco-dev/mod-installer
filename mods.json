@@ -205,6 +205,12 @@
       "side": "both"
     },
     {
+      "filename": "missile-program-0.1.0.jar",
+      "url": "https://github.com/lilkuzco-dev/missile-program/releases/download/v0.1.0/missile-program-0.1.0.jar",
+      "sha512": "291b71b58a026cf9448ac243043cc4ac2bf090c6723fb436011b0a1e921aa769e9f0b2cfc327f24f8392cb6a45e25eb0e1ca1dd2eb2da54882b58ef0a655c060",
+      "side": "both"
+    },
+    {
       "filename": "lilkuzco-cosmos-0.2.3.jar",
       "url": "https://github.com/lilkuzco-dev/lilkuzco_cosmos/releases/download/v0.2.3/lilkuzco-cosmos-0.2.3.jar",
       "sha512": "25dae4520f6b1748288a0e2bb0b9383203151ea1085ee43a2661823c6043a031c62b3057a349a19ab20f0423572da467a54c38cccd9d881db643b0c3c7316c10",
