@@ -193,6 +193,12 @@
       "side": "both"
     },
     {
+      "filename": "hirelings-0.1.0.jar",
+      "url": "https://github.com/lilkuzco-dev/hirelings/releases/download/v0.1.0/hirelings-0.1.0.jar",
+      "sha512": "c2799f6be7e57839c676df24695d12d7d7ab966f363e9ade312fb445365d49787fe079d4dc5165e28216ff4bf152af7b912a8e7983c1195dd7b510aa5f209de5",
+      "side": "both"
+    },
+    {
       "filename": "lilkuzco-kinetics-0.1.4.jar",
       "url": "https://github.com/lilkuzco-dev/lilkuzco_kinetics/releases/download/v0.1.4/lilkuzco-kinetics-0.1.4.jar",
       "sha512": "825565a25c5efaae052e834ea98004e6544b5de64bdba6a81af7638ed2021a4ebfe4cab3a66d6a671f985fca773f6bfae2394d0932768b09612144060fc780c6",
