@@ -233,9 +233,9 @@
       "side": "server"
     },
     {
-      "filename": "enchanted-forest-0.1.3.jar",
-      "url": "https://github.com/lilkuzco-dev/enchanted-forest/releases/download/v0.1.3/enchanted-forest-0.1.3.jar",
-      "sha512": "2721c6aed67f17ed7767a777542df5893c3b9655d5e33af474f6a9c4a7527e3480c488d38270d9603360d7207695590557c00819e1750a99b2f23b5056fe7185",
+      "filename": "enchanted-forest-0.1.4.jar",
+      "url": "https://github.com/lilkuzco-dev/enchanted-forest/releases/download/v0.1.4/enchanted-forest-0.1.4.jar",
+      "sha512": "6431ea2b1e7f636b0e4fef4f8185fc4d755767cdac9f93d6e953f27727d66ff173584db39497dc7364bb8b3d2b2e32fd3f2b9b5d8ee0be7708f0f3754cbb6e79",
       "side": "both"
     }
   ]
