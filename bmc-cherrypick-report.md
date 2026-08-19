@@ -50,7 +50,7 @@ These needed exact-slug rechecks rather than name search. Closed out:
 | Wave | State |
 |---|---|
 | Wave 1 — perf (12) | ✅ **adopted** 2026-08-16, in `mods.json` with side tags |
-| Wave 2 — QoL (14) | ✅ **adopted** 2026-08-16, in `mods.json` with side tags |
+| Wave 2 — QoL (12) | ✅ **adopted** 2026-08-16; mapping overlays removed 2026-08-18 for satellite progression |
 | Wave 3 — worldgen/structures (7) | ✅ **shipped** 2026-08-16 — Terralith ruling settled; `serene-seasons` held back |
 | Off-list additions (4) | ✅ **adopted** 2026-08-16, separate follow-up commit |
 | Launch-screenshot verification | ✅ **CLOSED — superseded** (see below) |
@@ -161,14 +161,12 @@ The **side** column is the manifest tag to use. It is derived from Modrinth's `c
 | Structure Layout Optimizer | perf | `structure-layout-optimizer` | **server** | Speeds structure placement — directly helps warfront's generator. |
 | spark | qol | `spark` | **both†** | Profiler. Not a speed-up; it's how we prove which of our 3 mods costs what. |
 
-### Wave 2 — Quality of life (14) · safe, no world impact
+### Wave 2 — Quality of life (12) · safe, no world impact
 
 | Mod | Category | Slug | Side | Why |
 |---|---|---|---|---|
 | Just Enough Items (JEI) | qol | `jei` | **client†** | Recipe/usage lookup — the baseline QoL mod. |
 | Jade 🔍 | qol | `jade` | **both†** | Look-at block/entity HUD; will surface menagerie diet/territory data. |
-| Xaero's Minimap | qol | `xaeros-minimap` | **client†** | Minimap. |
-| Xaero's World Map | qol | `xaeros-world-map` | **client†** | Full world map; pairs with the minimap. |
 | Clumps | qol | `clumps` | **both†** | Merges XP orbs — a real perf win too, but behaviour-visible. |
 | Controlling | qol | `controlling` | **client** | Searchable keybind menu; mandatory once the list is this long. |
 | Mouse Tweaks | qol | `mouse-tweaks` | **client** | Inventory drag/scroll handling. |
@@ -208,6 +206,8 @@ Every Wave 3 entry is also in the conflict table below. This is the smallest set
 
 | Mod | Slug | Ruling |
 |---|---|---|
+| Xaero's Minimap | `xaeros-minimap` | **Progression-gated — do not ship as baseline QoL.** The always-on minimap and its local death waypoints reveal terrain and locations before the empire has earned mapping capability. Mapping is reserved for a future satellite-technology system and must remain absent until that progression exists. Ruled by Jesse 2026-08-18. |
+| Xaero's World Map | `xaeros-world-map` | **Progression-gated — do not ship as baseline QoL.** A complete client map bypasses the intended satellite-technology progression. It must remain absent until mapping is implemented as an earned satellite capability rather than an always-available client overlay. Ruled by Jesse 2026-08-18. |
 | Magnum Torch | `magnum-torch` | **Permanently rejected — mechanical conflict.** It suppresses all natural mob spawning in a large radius around the placed block. That is precisely the mechanic menagerie's territory system is built on, so a Magnum Torch silently voids territory behaviour for every chunk in range — with no error, no log line, and no obvious cause. The failure mode is invisible, which is what makes it worse than an outright crash. Screens as `AVAILABLE_26.2` and reads like a harmless QoL torch; it is not. Ruled out by Jesse 2026-08-16. |
 | Biomes O' Plenty | `biomes-o-plenty` | **Permanently excluded — a choice, not a conflict.** Ruled out in favor of **Terralith**, which is the empire's worldgen. BoP is a perfectly good mod and screens clean on 26.2; it is simply not the one we are building the world on, and running both would mean two biome sources competing over the same terrain. Do not re-propose it on availability grounds — availability was never the question. Ruled by Jesse 2026-08-16. |
 
@@ -366,10 +366,10 @@ Sorted by downloads. Everything adoptable today, shortlisted or not.
 | Entity Culling | perf | `entityculling` | client | `1.10.5` |
 | FerriteCore | perf | `ferrite-core` | both† | `9.0.0-fabric` |
 | ImmediatelyFast | perf | `immediatelyfast` | client | `1.16.2+26.2-fabric` |
-| Xaero's Minimap | qol | `xaeros-minimap` | client† | `fabric-26.2-26.4.2` |
+| Xaero's Minimap 🚫 **DO NOT ADOPT** | qol | `xaeros-minimap` | client† | `fabric-26.2-26.4.2` |
 | [ETF] Entity Texture Features | qol | `entitytexturefeatures` | client | `7.1.1-fabric-26.2` |
 | Architectury API | library | `architectury-api` | both | `21.0.7+fabric` |
-| Xaero's World Map | qol | `xaeros-world-map` | client† | `fabric-26.2-1.44.2` |
+| Xaero's World Map 🚫 **DO NOT ADOPT** | qol | `xaeros-world-map` | client† | `fabric-26.2-1.44.2` |
 | [EMF] Entity Model Features | qol | `entity-model-features` | client | `3.2.6-fabric-26.2` |
 | Not Enough Animations | content | `not-enough-animations` | client | `1.12.4` |
 | Just Enough Items (JEI) | qol | `jei` | client† | `30.24.0.165` |

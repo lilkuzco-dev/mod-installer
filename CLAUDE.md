@@ -26,16 +26,18 @@ let Jesse decide.
 
 ## 2. The exclusion map — never re-propose these
 
-Both are permanent. They will keep screening as `AVAILABLE_26.2` and will keep
+These are permanent. They will keep screening as `AVAILABLE_26.2` and will keep
 looking like reasonable picks. That is exactly why they are written down.
 
 | Mod | Ruling |
 |---|---|
 | `biomes-o-plenty` | **Excluded by choice, not by conflict.** Terralith is the empire's worldgen. BoP is a good mod and screens clean; it is simply not the one the world is built on, and running both means two biome sources competing over the same terrain. **Do not re-propose it on availability grounds — availability was never the question.** |
 | `magnum-torch` | **Do not adopt — mechanical conflict with Menagerie.** It suppresses all natural mob spawning in a large radius, which is precisely what Menagerie's territory system runs on. It voids territory behaviour for every chunk in range with **no error, no log line, and no crash** — the failure is invisible, which makes it worse than something that fails loudly. It reads like a harmless QoL torch. It is not. |
+| `xaeros-minimap` | **Progression-gated.** The minimap and its client-side death waypoints must not be available by default. Mapping is reserved for future satellite technology. |
+| `xaeros-world-map` | **Progression-gated.** A complete map must not be available by default. Mapping is reserved for future satellite technology. |
 
 The authoritative copy lives in `tools/bmc-report.py` (`DO_NOT_ADOPT`), which renders
-both into `bmc-cherrypick-report.md`. Add new exclusions **there**, not by hand-editing
+all entries into `bmc-cherrypick-report.md`. Add new exclusions **there**, not by hand-editing
 the report — see rule 4.
 
 ## 3. Manifest discipline: deploys resolve only from committed manifests

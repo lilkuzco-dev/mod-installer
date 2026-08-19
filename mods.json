@@ -71,14 +71,6 @@
       "side": "both"
     },
     {
-      "slug": "xaeros-minimap",
-      "side": "client"
-    },
-    {
-      "slug": "xaeros-world-map",
-      "side": "client"
-    },
-    {
       "slug": "clumps",
       "side": "both"
     },

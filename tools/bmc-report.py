@@ -13,6 +13,17 @@ av = [r for r in res if r["status"] == "AVAILABLE_26.2"]
 # side, which cannot be turned into a manifest tag mechanically. These are my
 # calls, marked with a dagger in the tables.
 DO_NOT_ADOPT = {
+    "xaeros-minimap": (
+        "**Progression-gated — do not ship as baseline QoL.** The always-on minimap and its local "
+        "death waypoints reveal terrain and locations before the empire has earned mapping capability. "
+        "Mapping is reserved for a future satellite-technology system and must remain absent until that "
+        "progression exists. Ruled by Jesse 2026-08-18."
+    ),
+    "xaeros-world-map": (
+        "**Progression-gated — do not ship as baseline QoL.** A complete client map bypasses the intended "
+        "satellite-technology progression. It must remain absent until mapping is implemented as an earned "
+        "satellite capability rather than an always-available client overlay. Ruled by Jesse 2026-08-18."
+    ),
     "magnum-torch": (
         "**Permanently rejected — mechanical conflict.** It suppresses all natural mob spawning in a "
         "large radius around the placed block. That is precisely the mechanic menagerie's territory "
@@ -140,8 +151,6 @@ WAVE1 = [
 WAVE2 = [
     ("jei", "Recipe/usage lookup — the baseline QoL mod."),
     ("jade", "Look-at block/entity HUD; will surface menagerie diet/territory data."),
-    ("xaeros-minimap", "Minimap."),
-    ("xaeros-world-map", "Full world map; pairs with the minimap."),
     ("clumps", "Merges XP orbs — a real perf win too, but behaviour-visible."),
     ("controlling", "Searchable keybind menu; mandatory once the list is this long."),
     ("mouse-tweaks", "Inventory drag/scroll handling."),
@@ -256,7 +265,7 @@ W("")
 W("| Wave | State |")
 W("|---|---|")
 W("| Wave 1 — perf (12) | ✅ **adopted** 2026-08-16, in `mods.json` with side tags |")
-W("| Wave 2 — QoL (14) | ✅ **adopted** 2026-08-16, in `mods.json` with side tags |")
+W("| Wave 2 — QoL (12) | ✅ **adopted** 2026-08-16; mapping overlays removed 2026-08-18 for satellite progression |")
 W("| Wave 3 — worldgen/structures (7) | ✅ **shipped** 2026-08-16 — Terralith ruling settled; `serene-seasons` held back |")
 W("| Off-list additions (4) | ✅ **adopted** 2026-08-16, separate follow-up commit |")
 W("| Launch-screenshot verification | ✅ **CLOSED — superseded** (see below) |")
@@ -346,7 +355,7 @@ W("|---|---|---|---|---|")
 for slug, why in WAVE1:
     W(row(slug, why))
 W("")
-W("### Wave 2 — Quality of life (14) · safe, no world impact")
+W("### Wave 2 — Quality of life (12) · safe, no world impact")
 W("")
 W("| Mod | Category | Slug | Side | Why |")
 W("|---|---|---|---|---|")
