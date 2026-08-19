@@ -229,6 +229,12 @@
       "side": "both"
     },
     {
+      "filename": "haunted-house-mod-0.1.0.jar",
+      "url": "https://github.com/lilkuzco-dev/haunted-house-mod/releases/download/v0.1.0/haunted-house-mod-0.1.0.jar",
+      "sha512": "97666ed24aefd2ac6424671429f2bbfe6a15c3b770707f5fa6b1bf7208a99a53df257c83204044a779b199da93730c9379950e75b3b4c03be57fbdc038fc9d26",
+      "side": "both"
+    },
+    {
       "filename": "empire_worldgen-0.1.0.jar",
       "url": "https://github.com/lilkuzco-dev/empire-worldgen/releases/download/v0.1.0/empire_worldgen-0.1.0.jar",
       "sha512": "bf85432377dba9a81bffb3750be0850dc15c8753b5fbe73818e3319dec90833daf41b1b01c562edadf5fefb07e4efe60f7d334b100a59e3552a3af003582b72d",
