@@ -167,9 +167,9 @@
       "side": "both"
     },
     {
-      "filename": "warfront-0.4.6.jar",
-      "url": "https://github.com/lilkuzco-dev/warfront/releases/download/v0.4.6/warfront-0.4.6.jar",
-      "sha512": "f28bf84635d1615b895ae5b5d7dc012a255df8d7fa373d06ec46f75bc94c1c6276e991d907f501d4f65b5347dce04d97a4aaddf48fdad969dedc1817edf6aac0",
+      "filename": "warfront-0.4.7.jar",
+      "url": "https://github.com/lilkuzco-dev/warfront/releases/download/v0.4.7/warfront-0.4.7.jar",
+      "sha512": "8979d243114b26d6fe9b0df6cbc89142d1c5443316c20278c28c7901e8011182541432276cd1f7a824ab0e9c400b037baf9b3a34f8b2cfdc65e20d4410c2d5b9",
       "side": "both"
     },
     {
@@ -242,6 +242,12 @@
       "filename": "enchanted-forest-0.1.9.jar",
       "url": "https://github.com/lilkuzco-dev/enchanted-forest/releases/download/v0.1.9/enchanted-forest-0.1.9.jar",
       "sha512": "3f5cd46bf97a467a5075d044cedcab7e74ef5c2caaf5d1816ac07defac9ec709673c9d391f4bcf25385930a5126624d9b52ae3625477a20f55e9b97e39faadc0",
+      "side": "both"
+    },
+    {
+      "filename": "dragons-0.1.0.jar",
+      "url": "https://github.com/lilkuzco-dev/dragons/releases/download/v0.1.0/dragons-0.1.0.jar",
+      "sha512": "c854361b8f20db9db5cf9e16bb4cf2220eedc74bc8d1a3f15626febbe282b5ff25db0ad453553fc5be4432126bdc045762611a96e3f6db5fc32d8fbaac8bb1cd",
       "side": "both"
     }
   ]
