@@ -227,9 +227,9 @@
       "side": "both"
     },
     {
-      "filename": "empire_worldgen-0.1.0.jar",
-      "url": "https://github.com/lilkuzco-dev/empire-worldgen/releases/download/v0.1.0/empire_worldgen-0.1.0.jar",
-      "sha512": "bf85432377dba9a81bffb3750be0850dc15c8753b5fbe73818e3319dec90833daf41b1b01c562edadf5fefb07e4efe60f7d334b100a59e3552a3af003582b72d",
+      "filename": "empire_worldgen-0.2.0.jar",
+      "url": "https://github.com/lilkuzco-dev/empire-worldgen/releases/download/v0.2.0/empire_worldgen-0.2.0.jar",
+      "sha512": "a32d2aafc9eb11ad8c3caf3bfcdc6bff15565970e4471501da25148109590b2c04e72380f91b5be1c1b13542648c986d5c4585313a2bbfb7b47a7b94d3bac10a",
       "side": "server"
     },
     {
