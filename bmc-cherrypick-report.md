@@ -317,9 +317,9 @@ Gates crop/forage growth by season. Would silently reshape menagerie's forage av
 | BMC4 mod (Forge) | Fabric equivalent | Status on 26.2 |
 |---|---|---|
 | Oculus | Iris (`iris`) | ✅ `1.11.2+26.2-fabric` |
-| Farmer's Delight | Farmer's Delight Refabricated (`farmers-delight-refabricated`) | ✅ `26.2-3.6.15` |
+| Farmer's Delight | Farmer's Delight Refabricated (`farmers-delight-refabricated`) | ✅ `26.2-3.6.16` |
 | Krypton (FNP) | Krypton (`krypton`) | ✅ `0.3.1` |
-| Repurposed Structures | Repurposed Structures (Fabric) (`repurposed-structures-fabric`) | ✅ `7.7.5+26.2-fabric` |
+| Repurposed Structures | Repurposed Structures (Fabric) (`repurposed-structures-fabric`) | ✅ `7.7.6+26.2-fabric` |
 | Friends and Foes | Friends and Foes (`friends-and-foes`) | ✅ `fabric-4.0.27+mc26.2` |
 | Quark | Supplementaries / Amendments / Chipped / Handcrafted | ❌ all stale at **1.21.1** — no Quark replacement exists on 26.2 |
 | Alex's Mobs | Naturalist | ❌ Naturalist stale at **1.21.1** (and would conflict with menagerie anyway) |
