@@ -12,7 +12,7 @@ const path = require("node:path");
 const { Readable } = require("node:stream");
 const { pipeline } = require("node:stream/promises");
 
-const VERSION = "1.2.0";
+const VERSION = "1.3.0";
 const API = "https://api.modrinth.com/v2";
 const USER_AGENT = `mod-installer/${VERSION} (friend-group Minecraft mod sync; Node.js CLI)`;
 const DOWNLOAD_CONCURRENCY = 3;
