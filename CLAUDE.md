@@ -57,9 +57,19 @@ Corollaries:
   shipped the one without them beside a cosmos that needed them, and **the load-compatibility gate
   could not see it**: cosmos declared `kinetics >=0.1.3` and 0.1.3 was present. A version predicate
   cannot catch a version that changed underneath it.
-- **Before claiming a set is good to go, rebuild from committed source and compare the hash to the
-  manifest.** That single check caught the above, and would have caught the earlier case where a
-  release was built from uncommitted source. Two different failures, one cheap test.
+- **Before claiming a set is good to go, rebuild from committed source and compare the rebuild to
+  the shipped jar with `node tools/jar-compare.js <shipped.jar> <rebuilt.jar>`.** That single check
+  caught the above, and would have caught the earlier case where a release was built from
+  uncommitted source. Two different failures, one cheap test.
+
+  Compare with that tool rather than with `shasum`. Loom writes `Fabric-Loom-Client-Only-Entries`
+  in `META-INF/MANIFEST.MF` in **set iteration order**, so two builds of byte-identical source can
+  differ by the order of that one line — a different sha512 over an identical mod. Measured
+  2026-08-20: `enchanted-forest 0.1.9` and `waldschatten 0.1.2` both failed a hash comparison
+  against their own shipped release for exactly this reason and were in fact the committed source,
+  while `hirelings 0.6.0` reproduced byte-for-byte. `jar-compare` reads every entry's CRC, so it
+  answers the question actually being asked — *is this the same mod* — and it still fails loudly on
+  a single changed class. A check that cries wolf is a check people learn to skip.
 - Ship is not done when the release is live; ship is done when `tools/postship-check.sh`
   passes. See `SHIPPING.md`.
 - Verify every `side` tag against Modrinth's `client_side`/`server_side` before
