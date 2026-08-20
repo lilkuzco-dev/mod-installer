@@ -173,6 +173,12 @@
       "side": "both"
     },
     {
+      "filename": "underground-cities-0.1.0.jar",
+      "url": "https://github.com/lilkuzco-dev/underground-cities/releases/download/v0.1.0/underground-cities-0.1.0.jar",
+      "sha512": "10f0bddd74b9fbb1f61596b0f568a5d2feeb08be81ab503b04d0f13069b118ddc933c2a77613e7b6d36fbbe1dc59abe8a42322ca4c27bbcd2a842b26ce2806d0",
+      "side": "server"
+    },
+    {
       "filename": "menagerie-0.4.8.jar",
       "url": "https://github.com/lilkuzco-dev/menagerie/releases/download/v0.4.8/menagerie-0.4.8.jar",
       "sha512": "68d696e686e767df8a710926b7d1abc9c98b07baa5fd09bcd13598115238c4116889c6d8be120a758751ba51749cf16e4125eb0313ee79ae009d9bbfaf15e38a",
