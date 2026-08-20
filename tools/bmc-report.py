@@ -1,8 +1,21 @@
-import json, os
+import argparse, json, os
 
-SP = "/private/tmp/claude-501/-Users-jessehagy-Desktop-mod-installer/78bb7801-321c-4609-8e02-e8f2da7bea1a/scratchpad"
-d = json.load(open(f"{SP}/bmc-screen-results.json"))
-eq = json.load(open(f"{SP}/equiv.json"))
+# Inputs and output are resolved relative to the repository, not to whatever
+# scratch directory happened to exist the day this was written. Both were once
+# hardcoded into a session-specific /private/tmp path, which meant the generator
+# could not be re-run at all — and rule 4 (patch the generator, never the output)
+# is worthless when the generator does not run. Both inputs are committed.
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+ap = argparse.ArgumentParser(description="render bmc-cherrypick-report.md from the screen results")
+ap.add_argument("--results", default=os.path.join(ROOT, "bmc-screen-results.json"))
+ap.add_argument("--equiv", default=os.path.join(ROOT, "equiv.json"))
+ap.add_argument("--out", default=os.path.join(ROOT, "bmc-cherrypick-report.md"),
+                help="write here instead; use a temp path to diff before committing")
+args = ap.parse_args()
+
+d = json.load(open(args.results))
+eq = json.load(open(args.equiv))
 res = d["results"]
 by_slug = {r["modrinthSlug"]: r for r in res if r.get("modrinthSlug")}
 eq_by_slug = {r["modrinthSlug"]: r for r in eq["results"] if r.get("modrinthSlug")}
@@ -489,5 +502,5 @@ W("## Next step")
 W("")
 W("Wave 3 waits for the fresh-world day and the Terralith-vs-BoP ruling. Re-run `tools/bmc-screen.js` before that pass — the watchlist above moves fast, and `yungs-api` reaching 26.2 would unblock the whole YUNG's suite at once.")
 
-open("/Users/jessehagy/Desktop/mod-installer/bmc-cherrypick-report.md", "w").write("\n".join(out) + "\n")
-print("wrote bmc-cherrypick-report.md:", len(out), "lines")
+open(args.out, "w").write("\n".join(out) + "\n")
+print("wrote", args.out + ":", len(out), "lines")
