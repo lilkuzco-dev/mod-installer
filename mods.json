@@ -245,9 +245,9 @@
       "side": "both"
     },
     {
-      "filename": "dragons-0.1.0.jar",
-      "url": "https://github.com/lilkuzco-dev/dragons/releases/download/v0.1.0/dragons-0.1.0.jar",
-      "sha512": "c854361b8f20db9db5cf9e16bb4cf2220eedc74bc8d1a3f15626febbe282b5ff25db0ad453553fc5be4432126bdc045762611a96e3f6db5fc32d8fbaac8bb1cd",
+      "filename": "dragons-0.1.1.jar",
+      "url": "https://github.com/lilkuzco-dev/dragons/releases/download/v0.1.1/dragons-0.1.1.jar",
+      "sha512": "d74be01642fc24a9e5317fe828ce9297890386f3147e0d9d41756a481d9e3d8f60ff584f603168c5615f1bfce63eabe245504959a839e047a219363d3246327d",
       "side": "both"
     }
   ]
