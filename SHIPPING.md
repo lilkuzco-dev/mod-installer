@@ -24,8 +24,19 @@ pipeline that had never loaded.
    ```
 
    It syncs the local mods folder, re-runs the installer `--dry-run` and requires a
-   zero-change plan, then independently re-hashes every `extra_mods` jar against the
-   manifest. Any divergence prints a mismatch table and exits nonzero.
+   zero-change plan, independently re-hashes every `extra_mods` jar against the
+   manifest, and then verifies the whole set can actually **load**. Any divergence
+   prints a mismatch table and exits nonzero.
+
+   The load step reads every jar's own `fabric.mod.json` — nested `META-INF/jars/`
+   included — and requires every declared dependency to be satisfied by something else
+   in the manifest. It exists because the first three steps all passed on a manifest
+   shipping `kinetics 0.1.1` beside a `cosmos` requiring `>=0.1.2`: the hashes were
+   perfect and the mod set would not have started. **Hashes matching is not the same as
+   mods starting.**
+
+   Run it alone with `node tools/load-check.js --side server` when preparing the server
+   mirror.
 5. Only after the gate passes: announce, verify in-game, write VERIFY entries.
 
 In-game verification of worldgen changes needs **fresh chunks** — and for structure

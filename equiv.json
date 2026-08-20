@@ -1,0 +1,205 @@
+{
+  "targetMc": "26.2",
+  "summary": {
+    "AVAILABLE_26.2": 8
+  },
+  "dropped": [],
+  "results": [
+    {
+      "name": "krypton",
+      "author": null,
+      "url": null,
+      "cfSlug": null,
+      "rawLabel": "krypton",
+      "injected": true,
+      "modrinthSlug": "krypton",
+      "modrinthTitle": "Krypton",
+      "categories": [
+        "optimization",
+        "utility"
+      ],
+      "clientSide": "optional",
+      "serverSide": "optional",
+      "downloads": 39283205,
+      "via": "search",
+      "status": "AVAILABLE_26.2",
+      "versionNumber": "0.3.1",
+      "versionType": "release",
+      "datePublished": "2026-07-14T22:10:35.227152Z",
+      "dependencies": []
+    },
+    {
+      "name": "bobby",
+      "author": null,
+      "url": null,
+      "cfSlug": null,
+      "rawLabel": "bobby",
+      "injected": true,
+      "modrinthSlug": "bobby",
+      "modrinthTitle": "Bobby",
+      "categories": [],
+      "clientSide": "required",
+      "serverSide": "unsupported",
+      "downloads": 19850061,
+      "via": "search",
+      "status": "AVAILABLE_26.2",
+      "versionNumber": "5.2.15+mc26.2",
+      "versionType": "release",
+      "datePublished": "2026-07-12T08:43:26.616328Z",
+      "dependencies": []
+    },
+    {
+      "name": "sodium-extra",
+      "author": null,
+      "url": null,
+      "cfSlug": null,
+      "rawLabel": "sodium-extra",
+      "injected": true,
+      "modrinthSlug": "sodium-extra",
+      "modrinthTitle": "Sodium Extra",
+      "categories": [
+        "cursed",
+        "optimization",
+        "utility"
+      ],
+      "clientSide": "required",
+      "serverSide": "unsupported",
+      "downloads": 90435333,
+      "via": "search",
+      "status": "AVAILABLE_26.2",
+      "versionNumber": "mc26.2-0.9.3+fabric",
+      "versionType": "release",
+      "datePublished": "2026-07-10T05:48:22.219199Z",
+      "dependencies": [
+        "AANobbMI"
+      ]
+    },
+    {
+      "name": "reeses-sodium-options",
+      "author": null,
+      "url": null,
+      "cfSlug": null,
+      "rawLabel": "reeses-sodium-options",
+      "injected": true,
+      "modrinthSlug": "reeses-sodium-options",
+      "modrinthTitle": "Reese's Sodium Options",
+      "categories": [
+        "utility"
+      ],
+      "clientSide": "required",
+      "serverSide": "unsupported",
+      "downloads": 75849196,
+      "via": "search",
+      "status": "AVAILABLE_26.2",
+      "versionNumber": "mc26.2-2.2.3+fabric",
+      "versionType": "release",
+      "datePublished": "2026-07-11T07:29:51.495619Z",
+      "dependencies": [
+        "AANobbMI"
+      ]
+    },
+    {
+      "name": "friends-and-foes",
+      "author": null,
+      "url": null,
+      "cfSlug": null,
+      "rawLabel": "friends-and-foes",
+      "injected": true,
+      "modrinthSlug": "friends-and-foes",
+      "modrinthTitle": "Friends&Foes (Fabric/Quilt)",
+      "categories": [
+        "adventure",
+        "mobs",
+        "worldgen"
+      ],
+      "clientSide": "required",
+      "serverSide": "required",
+      "downloads": 10879496,
+      "via": "search",
+      "status": "AVAILABLE_26.2",
+      "versionNumber": "fabric-4.0.27+mc26.2",
+      "versionType": "release",
+      "datePublished": "2026-08-07T06:26:27.985431Z",
+      "dependencies": [
+        "G1hIVOrD",
+        "P7dR8mSH"
+      ]
+    },
+    {
+      "name": "repurposed-structures-fabric",
+      "author": null,
+      "url": null,
+      "cfSlug": null,
+      "rawLabel": "repurposed-structures-fabric",
+      "injected": true,
+      "modrinthSlug": "repurposed-structures-fabric",
+      "modrinthTitle": "Repurposed Structures - Fabric",
+      "categories": [
+        "worldgen"
+      ],
+      "clientSide": "unsupported",
+      "serverSide": "required",
+      "downloads": 13024693,
+      "via": "search",
+      "status": "AVAILABLE_26.2",
+      "versionNumber": "7.7.6+26.2-fabric",
+      "versionType": "release",
+      "datePublished": "2026-08-20T01:35:53.805062Z",
+      "dependencies": [
+        "P7dR8mSH",
+        "codAaoxh"
+      ]
+    },
+    {
+      "name": "farmers-delight-refabricated",
+      "author": null,
+      "url": null,
+      "cfSlug": null,
+      "rawLabel": "farmers-delight-refabricated",
+      "injected": true,
+      "modrinthSlug": "farmers-delight-refabricated",
+      "modrinthTitle": "Farmer's Delight Refabricated",
+      "categories": [
+        "decoration",
+        "equipment",
+        "food"
+      ],
+      "clientSide": "required",
+      "serverSide": "required",
+      "downloads": 14636551,
+      "via": "search",
+      "status": "AVAILABLE_26.2",
+      "versionNumber": "26.2-3.6.16",
+      "versionType": "release",
+      "datePublished": "2026-08-17T21:24:17.858913Z",
+      "dependencies": [
+        "P7dR8mSH"
+      ]
+    },
+    {
+      "name": "iris",
+      "author": null,
+      "url": null,
+      "cfSlug": null,
+      "rawLabel": "iris",
+      "injected": true,
+      "modrinthSlug": "iris",
+      "modrinthTitle": "Iris Shaders",
+      "categories": [
+        "decoration",
+        "optimization"
+      ],
+      "clientSide": "required",
+      "serverSide": "unsupported",
+      "downloads": 164390948,
+      "via": "search",
+      "status": "AVAILABLE_26.2",
+      "versionNumber": "1.11.2+26.2-fabric",
+      "versionType": "release",
+      "datePublished": "2026-07-08T21:11:56.737884Z",
+      "dependencies": [
+        "AANobbMI"
+      ]
+    }
+  ]
+}

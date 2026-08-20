@@ -8,3 +8,19 @@ scratch/
 vibranium/
 warfront/
 menagerie/
+crude-empire/
+empire-worldgen/
+hirelings/
+waldschatten/
+haunted-house-mod/
+missile-program-mod/
+__pycache__/
+cruise-missile-program-mod/
+dragons/
+enchanted-forest/
+underground-cities/
+
+# aircraft/ is deliberately NOT ignored. Every other entry above is a mod that
+# lives in its own git repo with a remote; aircraft has no repo and no backup at
+# all, so ignoring it would make the one directory that exists nowhere else the
+# only one git never mentions. It stays loud until it is under version control.

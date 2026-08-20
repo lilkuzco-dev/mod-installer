@@ -1,0 +1,23 @@
+{
+  "stats": {
+    "minecraft:killed_by": {
+      "warfront:soldier": 1
+    },
+    "minecraft:custom": {
+      "minecraft:time_since_rest": 26,
+      "minecraft:walk_one_cm": 2254,
+      "minecraft:leave_game": 1,
+      "minecraft:damage_taken": 240,
+      "minecraft:play_time": 3367,
+      "minecraft:damage_dealt": 28,
+      "minecraft:jump": 66,
+      "minecraft:time_since_death": 0,
+      "minecraft:sprint_one_cm": 6503,
+      "minecraft:fall_one_cm": 1875,
+      "minecraft:total_world_time": 3395,
+      "minecraft:fly_one_cm": 19145,
+      "minecraft:deaths": 1
+    }
+  },
+  "DataVersion": 4903
+}

@@ -21,6 +21,27 @@ const DOWNLOAD_CONCURRENCY = 3;
 // running with no arguments syncs against the shared list.
 const BAKED_MANIFEST_URL = null;
 
+// The load-compatibility gate. Its logic lives in tools/load-check.js — one
+// implementation, the same one deploy-server.sh runs, so the two sides cannot drift.
+// A relative require() does not resolve inside a single-executable binary, so build.js
+// replaces the line below with that module's contents inlined.
+const INLINED_LOAD_CHECK = null;
+
+// Resolve the gate loudly. A gate that can quietly go missing is not a gate — the sync
+// would report success over precisely the mod set it exists to reject.
+function loadGate() {
+  if (INLINED_LOAD_CHECK) return INLINED_LOAD_CHECK;
+  try {
+    return require("./tools/load-check.js");
+  } catch (err) {
+    throw new Error(
+      `Load-compatibility gate unavailable: ${err.message}\n` +
+        `Run mod-installer.js from a full checkout (it needs tools/load-check.js beside it), ` +
+        `or use the standalone binary, which carries the gate inside it.`,
+    );
+  }
+}
+
 const USAGE = `mod-installer — sync a Minecraft mods folder from a shared manifest via Modrinth
 
 Usage:
@@ -48,6 +69,11 @@ Manifest format:
   and side-taggable the same way:
   [{ "filename": "my-mod.jar", "url": "https://...", "sha512": "<128 hex chars>",
      "side": "both" }]
+
+Load check:
+  Before anything is written, the mod set this sync would produce is checked for load
+  compatibility: every jar's declared dependencies must be satisfied by the set. If they
+  are not, the sync stops and your mods folder is left exactly as it was.
 
 Servers:
   mod-installer --dir /srv/mc/mods --side server`;
@@ -448,6 +474,58 @@ async function runPool(items, limit, worker) {
   if (errors.length > 0) throw new Error(errors.map((e) => e.message).join("\n"));
 }
 
+// The exact jar set the mods folder will hold once this sync commits: every install-set
+// entry — from staging if it was just downloaded, from the folder if it is being kept —
+// plus any unmanaged jars --no-remove leaves behind. Judging this set, rather than the
+// folder as it currently stands, is what makes the check a pre-flight and not a post-mortem.
+function predictedJarPaths(entries, plan, modsDir, stagingDir, noRemove) {
+  const staged = new Set([...plan.adds, ...plan.replaces].map((e) => e.filename));
+  const paths = entries.map((e) =>
+    staged.has(e.filename) ? path.join(stagingDir, e.filename) : path.join(modsDir, e.filename),
+  );
+  if (noRemove) paths.push(...plan.removes.map((name) => path.join(modsDir, name)));
+  return paths;
+}
+
+// The gate. Every jar's own fabric.mod.json — including the nested jars mods bundle under
+// META-INF/jars — must have its declared "depends" satisfied by something else in the set,
+// and its "breaks" satisfied by nothing. Hash integrity and load compatibility are
+// different properties: a folder can match the manifest byte for byte and still be a set
+// Fabric refuses to start. That is the failure this stands in front of.
+async function runLoadGate(jarPaths, manifest, side, managed) {
+  const { analyzeJars } = loadGate();
+  const { mods, malformed, errors, warnings } = await analyzeJars(jarPaths, { manifest, side });
+  const bundled = mods.filter((m) => m.nested).length;
+  console.log(`\nLoad check: ${mods.length - bundled} mod(s) (+${bundled} bundled), side=${side}`);
+  for (const bad of malformed) console.log(`  !! ${bad.file}: unreadable fabric.mod.json — ${bad.reason}`);
+  for (const warning of warnings) console.log(`  ~  ${warning.mod} ${warning.detail}`);
+
+  if (errors.length === 0) {
+    console.log(`  PASS — every declared dependency is satisfied by this set.`);
+    return;
+  }
+  const detail = errors.map((e) => `  ${e.mod}  (${e.file})\n     ${e.detail}`).join("\n");
+
+  // Blame the right party. Under --no-remove the set includes jars the manifest never
+  // put there, and telling someone to go fix the shared manifest over their own private
+  // mod would send them down the wrong path entirely. A `file` is "parent.jar :: nested.jar"
+  // for a bundled jar and a comma-separated list for a duplicate-id clash, so the owning
+  // jars are the head of each comma-separated segment.
+  const owningJars = (label) =>
+    String(label).split(",").map((segment) => segment.trim().split(" :: ")[0]).filter(Boolean);
+  const strays = errors.filter((e) => owningJars(e.file).some((jar) => !managed.has(jar)));
+  const closing = strays.length
+    ? `${strays.length === errors.length ? "These come" : "Some of these come"} from jar(s) the ` +
+      `manifest does not manage — your own additions, kept by --no-remove. Remove them from the ` +
+      `mods folder, or sync without --no-remove.`
+    : `The manifest is what needs fixing — send this to whoever maintains it.`;
+
+  throw new Error(
+    `LOAD CHECK FAILED — this mod set would not start, so your mods folder was left untouched.\n\n` +
+      `${detail}\n\n${errors.length} unsatisfied dependenc${errors.length === 1 ? "y" : "ies"}. ${closing}`,
+  );
+}
+
 function timestamp() {
   const d = new Date();
   const p = (n) => String(n).padStart(2, "0");
@@ -495,46 +573,76 @@ async function main() {
   for (const name of plan.removes) console.log(`  - remove   ${name}${opts.noRemove ? "  (kept: --no-remove)" : ""}`);
 
   if (opts.dryRun) {
-    console.log(`\nDry run — nothing was changed.`);
+    // The load check reads the jars themselves, so it cannot run over files that were
+    // never downloaded. Saying so beats letting a clean dry run imply a checked set.
+    console.log(`\nDry run — nothing was changed. (Load check skipped: it reads the jars, which a dry run does not fetch.)`);
     return;
   }
 
   const removals = opts.noRemove ? [] : plan.removes;
   const downloads = [...plan.adds, ...plan.replaces];
-  if (downloads.length === 0 && removals.length === 0) {
-    console.log(`\nAlready in sync — nothing to do.`);
-    return;
-  }
+  const inSync = downloads.length === 0 && removals.length === 0;
 
-  let backupDir = null;
-  if (plan.folderExists && plan.folderEntries > 0) {
-    backupDir = path.join(path.dirname(modsDir), `mods-backup-${timestamp()}`);
-    await fs.cp(modsDir, backupDir, { recursive: true });
-    console.log(`\nBacked up mods folder to ${backupDir}`);
-  } else {
-    console.log(`\nNo existing mods to back up.`);
-  }
-  await fs.mkdir(modsDir, { recursive: true });
+  // Downloads land outside the mods folder and the resulting set is gated before anything
+  // moves in. The folder is only touched once that set is known to start — the same
+  // property deploy-server.sh buys with a staging dir, and the reason a friend cannot be
+  // left holding a synced-but-unstartable folder.
+  const stagingDir = path.join(path.dirname(modsDir), `mods-staging-${timestamp()}`);
+  let staged = false;
+  try {
+    if (downloads.length > 0) {
+      await fs.mkdir(stagingDir, { recursive: true });
+      staged = true;
+      const totalSize = downloads.reduce((sum, e) => sum + e.size, 0);
+      const sizeNote = downloads.every((e) => e.size > 0) ? `, ${fmtSize(totalSize)} total` : "";
+      console.log(`\nDownloading ${downloads.length} file(s)${sizeNote}...`);
+      await runPool(downloads, DOWNLOAD_CONCURRENCY, async (entry) => {
+        await downloadVerified(entry, stagingDir);
+        console.log(`  + ${entry.filename}  (SHA-512 verified)`);
+      });
+    }
 
-  if (downloads.length > 0) {
-    const totalSize = downloads.reduce((sum, e) => sum + e.size, 0);
-    const sizeNote = downloads.every((e) => e.size > 0) ? `, ${fmtSize(totalSize)} total` : "";
-    console.log(`Downloading ${downloads.length} file(s)${sizeNote}...`);
-    await runPool(downloads, DOWNLOAD_CONCURRENCY, async (entry) => {
-      await downloadVerified(entry, modsDir);
-      console.log(`  + ${entry.filename}  (SHA-512 verified)`);
-    });
-  }
-  for (const name of removals) {
-    await fs.rm(path.join(modsDir, name));
-    console.log(`  - ${name}  removed`);
-  }
+    // Gated even when the folder is already in sync. "Matches the manifest" and "will
+    // start" are different properties, and an already-synced folder is exactly where a
+    // manifest that outgrew its own jars sits unnoticed until launch.
+    await runLoadGate(
+      predictedJarPaths(entries, plan, modsDir, stagingDir, opts.noRemove),
+      manifest,
+      opts.side,
+      new Set(entries.map((e) => e.filename)),
+    );
 
-  console.log(
-    `\nDone: ${downloads.length} added/updated, ${plan.keeps.length} kept, ${removals.length} removed.` +
-      (opts.noRemove && plan.removes.length ? ` ${plan.removes.length} unmanaged jar(s) left in place (--no-remove).` : ""),
-  );
-  if (backupDir) console.log(`Backup: ${backupDir}`);
+    if (inSync) {
+      console.log(`\nAlready in sync — nothing to do.`);
+      return;
+    }
+
+    let backupDir = null;
+    if (plan.folderExists && plan.folderEntries > 0) {
+      backupDir = path.join(path.dirname(modsDir), `mods-backup-${timestamp()}`);
+      await fs.cp(modsDir, backupDir, { recursive: true });
+      console.log(`\nBacked up mods folder to ${backupDir}`);
+    } else {
+      console.log(`\nNo existing mods to back up.`);
+    }
+    await fs.mkdir(modsDir, { recursive: true });
+
+    for (const entry of downloads) {
+      await fs.rename(path.join(stagingDir, entry.filename), path.join(modsDir, entry.filename));
+    }
+    for (const name of removals) {
+      await fs.rm(path.join(modsDir, name));
+      console.log(`  - ${name}  removed`);
+    }
+
+    console.log(
+      `\nDone: ${downloads.length} added/updated, ${plan.keeps.length} kept, ${removals.length} removed.` +
+        (opts.noRemove && plan.removes.length ? ` ${plan.removes.length} unmanaged jar(s) left in place (--no-remove).` : ""),
+    );
+    if (backupDir) console.log(`Backup: ${backupDir}`);
+  } finally {
+    if (staged) await fs.rm(stagingDir, { recursive: true, force: true });
+  }
 }
 
 // In the standalone binary on Windows, a double-click opens a console window that

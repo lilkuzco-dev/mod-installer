@@ -64,19 +64,11 @@
     },
     {
       "slug": "jei",
-      "side": "client"
+      "side": "both"
     },
     {
       "slug": "jade",
       "side": "both"
-    },
-    {
-      "slug": "xaeros-minimap",
-      "side": "client"
-    },
-    {
-      "slug": "xaeros-world-map",
-      "side": "client"
     },
     {
       "slug": "clumps",
@@ -137,25 +129,125 @@
     {
       "slug": "carpet",
       "side": "server"
+    },
+    {
+      "slug": "sparsestructures",
+      "side": "server"
+    },
+    {
+      "slug": "terralith",
+      "side": "server"
+    },
+    {
+      "slug": "towns-and-towers",
+      "side": "server"
+    },
+    {
+      "slug": "repurposed-structures-fabric",
+      "side": "server"
+    },
+    {
+      "slug": "friends-and-foes",
+      "side": "both"
+    },
+    {
+      "slug": "illager-invasion",
+      "side": "both"
+    },
+    {
+      "slug": "chunky",
+      "side": "server"
     }
   ],
   "extra_mods": [
     {
-      "filename": "vibranium-1.6.0.jar",
-      "url": "https://github.com/lilkuzco-dev/vibranium/releases/download/v1.6.0/vibranium-1.6.0.jar",
-      "sha512": "5421f13a2471c95ecfb585714d5919d9763e4064d7b72a9bd7c6ecf517df8a278196ce4b0232622cdaa58105fa61abddd230ce2751350b5fecd29dd74d1ed3c6",
+      "filename": "vibranium-1.8.1.jar",
+      "url": "https://github.com/lilkuzco-dev/vibranium/releases/download/v1.8.1/vibranium-1.8.1.jar",
+      "sha512": "cc06af4bb4853eb22812a0efbeb4fc6509c84232c3fed13dfae1655c43fbcc262763bb947b9e458ff5e968bdb6fc709903320feec51e0b2fb4142073e9550310",
       "side": "both"
     },
     {
-      "filename": "warfront-0.2.1.jar",
-      "url": "https://github.com/lilkuzco-dev/warfront/releases/download/v0.2.1/warfront-0.2.1.jar",
-      "sha512": "3124ae909da9287a70820d18d47d3b1e4838c39d7a1cb905953a23e4df015f84c2779da559dec297be8f2e164189b8af37954b3a22801c2a3766475e4265d242",
+      "filename": "warfront-0.4.9.jar",
+      "url": "https://github.com/lilkuzco-dev/warfront/releases/download/v0.4.9/warfront-0.4.9.jar",
+      "sha512": "3edd08b502498bcce1e501e92894e77973c397e81282d095ade183f9890f411ca914f1db0c192eac8fec40cbfd100608287776193acd61110ad3fe312af6b1b2",
       "side": "both"
     },
     {
-      "filename": "menagerie-0.4.1.jar",
-      "url": "https://github.com/lilkuzco-dev/menagerie/releases/download/v0.4.1/menagerie-0.4.1.jar",
-      "sha512": "0ea2def3ef17035adddef3580a4af85b2bab0c6967a627461226610f556fe83a44ee042a8560320c8033bd4fea86e31ef89afcca96897a28aebdbcb03a29a0cb",
+      "filename": "underground-cities-0.1.0.jar",
+      "url": "https://github.com/lilkuzco-dev/underground-cities/releases/download/v0.1.0/underground-cities-0.1.0.jar",
+      "sha512": "10f0bddd74b9fbb1f61596b0f568a5d2feeb08be81ab503b04d0f13069b118ddc933c2a77613e7b6d36fbbe1dc59abe8a42322ca4c27bbcd2a842b26ce2806d0",
+      "side": "server"
+    },
+    {
+      "filename": "menagerie-0.4.8.jar",
+      "url": "https://github.com/lilkuzco-dev/menagerie/releases/download/v0.4.8/menagerie-0.4.8.jar",
+      "sha512": "68d696e686e767df8a710926b7d1abc9c98b07baa5fd09bcd13598115238c4116889c6d8be120a758751ba51749cf16e4125eb0313ee79ae009d9bbfaf15e38a",
+      "side": "both"
+    },
+    {
+      "filename": "crude_empire-0.3.0.jar",
+      "url": "https://github.com/lilkuzco-dev/crude-empire/releases/download/v0.3.0/crude_empire-0.3.0.jar",
+      "sha512": "bcaabb521385b881b243ae0401a0e224132b006481b578cb48a4480fd0499e2ead4be44515b1653b8e4bea43df61938cb6181fed5ce85de8972fafb9cfe7415f",
+      "side": "both"
+    },
+    {
+      "filename": "hirelings-0.6.0.jar",
+      "url": "https://github.com/lilkuzco-dev/hirelings/releases/download/v0.6.0/hirelings-0.6.0.jar",
+      "sha512": "49c3f4e11fd7dd1a395843ae4c1fdd85f472f69e7ecdf97aa30cdca9808f2333a0dd905ac9f673086c8ce502ad3e210d0ab68219bbb3b2a29e0734bfdc791b57",
+      "side": "both"
+    },
+    {
+      "filename": "lilkuzco-kinetics-0.1.5.jar",
+      "url": "https://github.com/lilkuzco-dev/lilkuzco_kinetics/releases/download/v0.1.5/lilkuzco-kinetics-0.1.5.jar",
+      "sha512": "2ab41e9edf085f58bdd158e393c6b10acdfb0be7a06d9c1d19d75679b7ae73bd7c5c4733b15c3dc675a9bb2ab53dd5a910f5d463c5d1d908606012f7c11d7bdf",
+      "side": "both"
+    },
+    {
+      "filename": "missile-program-0.1.0.jar",
+      "url": "https://github.com/lilkuzco-dev/missile-program/releases/download/v0.1.0/missile-program-0.1.0.jar",
+      "sha512": "291b71b58a026cf9448ac243043cc4ac2bf090c6723fb436011b0a1e921aa769e9f0b2cfc327f24f8392cb6a45e25eb0e1ca1dd2eb2da54882b58ef0a655c060",
+      "side": "both"
+    },
+    {
+      "filename": "lilkuzco-cosmos-0.2.3.jar",
+      "url": "https://github.com/lilkuzco-dev/lilkuzco_cosmos/releases/download/v0.2.3/lilkuzco-cosmos-0.2.3.jar",
+      "sha512": "25dae4520f6b1748288a0e2bb0b9383203151ea1085ee43a2661823c6043a031c62b3057a349a19ab20f0423572da467a54c38cccd9d881db643b0c3c7316c10",
+      "side": "both"
+    },
+    {
+      "filename": "cruise-missile-program-0.2.1.jar",
+      "url": "https://github.com/lilkuzco-dev/cruise-missile-program/releases/download/v0.2.1/cruise-missile-program-0.2.1.jar",
+      "sha512": "3c4bd348cae1338de7753139f47bb3aae9348c4b7334ef2dfb1b225bc5befb8b335749f24aa0f2f656f53f589dc68bfc1e4089489cd2746df42b63a4ec77c4b1",
+      "side": "both"
+    },
+    {
+      "filename": "waldschatten-0.1.2.jar",
+      "url": "https://github.com/lilkuzco-dev/waldschatten/releases/download/v0.1.2/waldschatten-0.1.2.jar",
+      "sha512": "9559d60b4656f364a1d7e7810adec1b763b589b22e0bf90420002ec56f034b30c900642eb3f0c9278d5186039a241bd38ebf81aa2c10d578201d670fd47604d8",
+      "side": "both"
+    },
+    {
+      "filename": "haunted-house-mod-0.1.0.jar",
+      "url": "https://github.com/lilkuzco-dev/haunted-house-mod/releases/download/v0.1.0/haunted-house-mod-0.1.0.jar",
+      "sha512": "97666ed24aefd2ac6424671429f2bbfe6a15c3b770707f5fa6b1bf7208a99a53df257c83204044a779b199da93730c9379950e75b3b4c03be57fbdc038fc9d26",
+      "side": "both"
+    },
+    {
+      "filename": "empire_worldgen-0.2.0.jar",
+      "url": "https://github.com/lilkuzco-dev/empire-worldgen/releases/download/v0.2.0/empire_worldgen-0.2.0.jar",
+      "sha512": "a32d2aafc9eb11ad8c3caf3bfcdc6bff15565970e4471501da25148109590b2c04e72380f91b5be1c1b13542648c986d5c4585313a2bbfb7b47a7b94d3bac10a",
+      "side": "server"
+    },
+    {
+      "filename": "enchanted-forest-0.1.9.jar",
+      "url": "https://github.com/lilkuzco-dev/enchanted-forest/releases/download/v0.1.9/enchanted-forest-0.1.9.jar",
+      "sha512": "3f5cd46bf97a467a5075d044cedcab7e74ef5c2caaf5d1816ac07defac9ec709673c9d391f4bcf25385930a5126624d9b52ae3625477a20f55e9b97e39faadc0",
+      "side": "both"
+    },
+    {
+      "filename": "dragons-0.1.1.jar",
+      "url": "https://github.com/lilkuzco-dev/dragons/releases/download/v0.1.1/dragons-0.1.1.jar",
+      "sha512": "d74be01642fc24a9e5317fe828ce9297890386f3147e0d9d41756a481d9e3d8f60ff584f603168c5615f1bfce63eabe245504959a839e047a219363d3246327d",
       "side": "both"
     }
   ]

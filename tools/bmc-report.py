@@ -1,8 +1,21 @@
-import json, os
+import argparse, json, os
 
-SP = "/private/tmp/claude-501/-Users-jessehagy-Desktop-mod-installer/78bb7801-321c-4609-8e02-e8f2da7bea1a/scratchpad"
-d = json.load(open(f"{SP}/bmc-screen-results.json"))
-eq = json.load(open(f"{SP}/equiv.json"))
+# Inputs and output are resolved relative to the repository, not to whatever
+# scratch directory happened to exist the day this was written. Both were once
+# hardcoded into a session-specific /private/tmp path, which meant the generator
+# could not be re-run at all — and rule 4 (patch the generator, never the output)
+# is worthless when the generator does not run. Both inputs are committed.
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+ap = argparse.ArgumentParser(description="render bmc-cherrypick-report.md from the screen results")
+ap.add_argument("--results", default=os.path.join(ROOT, "bmc-screen-results.json"))
+ap.add_argument("--equiv", default=os.path.join(ROOT, "equiv.json"))
+ap.add_argument("--out", default=os.path.join(ROOT, "bmc-cherrypick-report.md"),
+                help="write here instead; use a temp path to diff before committing")
+args = ap.parse_args()
+
+d = json.load(open(args.results))
+eq = json.load(open(args.equiv))
 res = d["results"]
 by_slug = {r["modrinthSlug"]: r for r in res if r.get("modrinthSlug")}
 eq_by_slug = {r["modrinthSlug"]: r for r in eq["results"] if r.get("modrinthSlug")}
@@ -12,7 +25,63 @@ av = [r for r in res if r["status"] == "AVAILABLE_26.2"]
 # Modrinth reports optional/optional for mods that run independently on either
 # side, which cannot be turned into a manifest tag mechanically. These are my
 # calls, marked with a dagger in the tables.
-DO_NOT_ADOPT = {"magnum-torch"}
+DO_NOT_ADOPT = {
+    "xaeros-minimap": (
+        "**Progression-gated — do not ship as baseline QoL.** The always-on minimap and its local "
+        "death waypoints reveal terrain and locations before the empire has earned mapping capability. "
+        "Mapping is reserved for a future satellite-technology system and must remain absent until that "
+        "progression exists. Ruled by Jesse 2026-08-18."
+    ),
+    "xaeros-world-map": (
+        "**Progression-gated — do not ship as baseline QoL.** A complete client map bypasses the intended "
+        "satellite-technology progression. It must remain absent until mapping is implemented as an earned "
+        "satellite capability rather than an always-available client overlay. Ruled by Jesse 2026-08-18."
+    ),
+    "magnum-torch": (
+        "**Permanently rejected — mechanical conflict.** It suppresses all natural mob spawning in a "
+        "large radius around the placed block. That is precisely the mechanic menagerie's territory "
+        "system is built on, so a Magnum Torch silently voids territory behaviour for every chunk in "
+        "range — with no error, no log line, and no obvious cause. The failure mode is invisible, which "
+        "is what makes it worse than an outright crash. Screens as `AVAILABLE_26.2` and reads like a "
+        "harmless QoL torch; it is not. Ruled out by Jesse 2026-08-16."
+    ),
+    "biomes-o-plenty": (
+        "**Permanently excluded — a choice, not a conflict.** Ruled out in favor of **Terralith**, which "
+        "is the empire's worldgen. BoP is a perfectly good mod and screens clean on 26.2; it is simply "
+        "not the one we are building the world on, and running both would mean two biome sources "
+        "competing over the same terrain. Do not re-propose it on availability grounds — availability "
+        "was never the question. Ruled by Jesse 2026-08-16."
+    ),
+}
+
+# Warnings the toolchain emits on every run that are understood and correct to ignore.
+# Deliberately NOT in DO_NOT_ADOPT: that map holds Jesse's standing rulings against adopting
+# a mod, and none of these are rulings. The point here is narrower — the warning is not a
+# defect, so nobody needs to chase it or grow the manifest to silence it. Whether to adopt
+# any of these mods on their own merits stays an open question.
+BENIGN_WARNINGS = [
+    (
+        "`friendsandfoes` recommends `yet_another_config_lib_v3`, not present",
+        "client + server",
+        "**Benign — a `recommends`, not a `depends`.** Friends&Foes actually depends on "
+        "`minecraft`, `fabricloader`, `fabric-api` and `resourcefullib`, every one of which the "
+        "manifest ships. YACL is a config-*screen* library: without it the mod loads and behaves "
+        "identically, and its settings are read from `config/friendsandfoes.json` rather than an "
+        "in-game screen. Fabric prints this at startup and `load-check` repeats it; neither is an "
+        "error, and the client has launched cleanly with YACL absent every time. Adopting YACL to "
+        "quiet the line would add a mod to the manifest for a cosmetic reason. Confirmed against "
+        "the jar's own `fabric.mod.json` 2026-08-17.",
+    ),
+    (
+        "`friendsandfoes` and `forgeconfigapiport` recommend `modmenu`, not present",
+        "server only",
+        "**Benign, and structural.** `modmenu` is a client mod — it draws the in-game mod list — so "
+        "it is tagged `client` in the manifest and correctly absent from a `--side server` sync. A "
+        "headless server has no GUI for it to add to. The warning is `load-check` faithfully "
+        "reporting a recommend that a server can never satisfy, not a gap in the server set. It "
+        "does **not** appear on the client, where `modmenu` is installed.",
+    ),
+]
 
 # ratified by Jesse 2026-08-16, not derived from Modrinth
 OFFLIST_SIDE = {"krypton": "both", "bobby": "client",
@@ -95,8 +164,6 @@ WAVE1 = [
 WAVE2 = [
     ("jei", "Recipe/usage lookup — the baseline QoL mod."),
     ("jade", "Look-at block/entity HUD; will surface menagerie diet/territory data."),
-    ("xaeros-minimap", "Minimap."),
-    ("xaeros-world-map", "Full world map; pairs with the minimap."),
     ("clumps", "Merges XP orbs — a real perf win too, but behaviour-visible."),
     ("controlling", "Searchable keybind menu; mandatory once the list is this long."),
     ("mouse-tweaks", "Inventory drag/scroll handling."),
@@ -164,16 +231,61 @@ W("")
 W("Screen of `modlist.html` (416 entries) against the Modrinth API for **Minecraft 26.2 / Fabric**.")
 W("Generated by `tools/bmc-screen.js`; raw data in `bmc-screen-results.json`.")
 W("")
+W("## 🤝 HANDOFF — read this first")
+W("")
+W("Campaign is **complete and shipped**. Waves 1, 2, 3 and the off-list four are all in `mods.json` on `main`. Nothing here is blocked or half-done. What follows is the standing work for whoever picks this up next.")
+W("")
+W("### (a) Standing task: the watchlist recheck")
+W("")
+W("The one recurring job. A large set of good mods are stuck **below 26.2** and become adoptable the day they update — check them and adopt on arrival:")
+W("")
+W("- **YUNG's suite** — the big one. All 11 sit at `26.1.2`, one version short. `yungs-api` moving to 26.2 unblocks the entire suite at once, so check that slug first and the rest follow.")
+W("- **ModernFix** (`1.21.4`), **Supplementaries** + **Amendments** (`1.21.1`) — the closest thing to a Quark replacement, which does not otherwise exist on 26.2.")
+W("- **When Dungeons Arise**, **Chipped**, **Handcrafted**, **Polymorph**, **Curios**, **Patchouli**, **Kiwi**, and the rest of the watchlist table below.")
+W("")
+W("Re-run the screener — **its cache makes re-runs nearly free**, so this is cheap to repeat often:")
+W("")
+W("```sh")
+W("node tools/bmc-screen.js modlist.html --mc 26.2")
+W("```")
+W("")
+W("`modlist.html` and `bmc-screen-cache.json` are both committed, so the command works from a clean checkout with no setup. Only entries whose status changed cost an API call. To force a recheck of the stale ones, drop the `FABRIC_BUT_OLD` and `NOT_FOUND` keys from the cache and re-run — everything already resolved returns instantly.")
+W("")
+W("### (b) New empire mods need no action here")
+W("")
+W("vibranium, warfront, menagerie and any future empire mod add their **own** `extra_mods` entries through their own ship rituals (build → release → manifest bump → `tools/postship-check.sh`). Do not pre-add them from this side; there is nothing to do here when a new one lands.")
+W("")
+W("### (c) Follow-up slugs — all resolved 2026-08-16")
+W("")
+W("These needed exact-slug rechecks rather than name search. Closed out:")
+W("")
+W("| Slug | Result |")
+W("|---|---|")
+W("| `guard-villagers-(fabricquilt)` | ✅ **Fabric fork is live** — `2.1.3-26.2`. The Forge `guard-villagers` is a dead end; this is the one to use if the mod is ever wanted. |")
+W("| `betterend` | ✅ `AVAILABLE_26.2` — `26.201.2`. Conflict-flagged (dimension worldgen + mob adder); needs a ruling, not just availability. |")
+W("| `betternether` | ✅ `AVAILABLE_26.2` — `26.201.2`. Same caveat as BetterEnd. |")
+W("| `farmers-delight-refabricated` | ✅ `AVAILABLE_26.2` — `26.2-3.6.15`. The live Fabric answer to Forge-only Farmer's Delight. |")
+W("| `corpse` | ❌ **Forge/NeoForge only**, no Fabric build. Genuinely unresolved — a Fabric death-chest alternative would need separate screening. |")
+W("")
+W("### Also worth knowing")
+W("")
+W("- Read `CLAUDE.md` before acting — the permanent rules (exact-PID kills, the exclusion map, manifest discipline, patch-the-generator) are all there.")
+W("- The **conflict table** further down is not stale: everything in it is still unadopted and still needs an explicit ruling before it goes in.")
+W("- `serene-seasons` is **held**, not rejected — Jesse rules on it after launch. It changes crop and visual pacing enough to want a live look first.")
+W("")
 W("## Status")
 W("")
 W("| Wave | State |")
 W("|---|---|")
 W("| Wave 1 — perf (12) | ✅ **adopted** 2026-08-16, in `mods.json` with side tags |")
-W("| Wave 2 — QoL (14) | ✅ **adopted** 2026-08-16, in `mods.json` with side tags |")
-W("| Wave 3 — worldgen/structures (4) | ⏸️ **ON HOLD** — waits for fresh-world day + the Terralith-vs-BoP ruling |")
+W("| Wave 2 — QoL (12) | ✅ **adopted** 2026-08-16; mapping overlays removed 2026-08-18 for satellite progression |")
+W("| Wave 3 — worldgen/structures (7) | ✅ **shipped** 2026-08-16 — Terralith ruling settled; `serene-seasons` held back |")
 W("| Off-list additions (4) | ✅ **adopted** 2026-08-16, separate follow-up commit |")
+W("| Launch-screenshot verification | ✅ **CLOSED — superseded** (see below) |")
 W("")
-W("`sparsestructures` leading Wave 3 is ratified. Everything in the conflict table stays out until explicitly approved.")
+W("**Launch verification is closed.** The client's clean **133-mod launch log** stands as the proof of record: all three empire mods initialised, the Warfront-Menagerie crossover active, **zero mixin conflicts, zero crash reports**. The world screenshot is superseded — it will be taken during the live server walk instead, where the server-tagged worldgen stack (Terralith, Sparse Structures, Towns and Towers, Repurposed Structures) is actually loaded and therefore actually visible. A client screenshot could never have shown it.")
+W("")
+W("**Terralith is the empire's worldgen.** Wave 3 shipped as: `sparsestructures` (the spacing lever, leading), `terralith`, `towns-and-towers`, `repurposed-structures-fabric`, `chunky` (ops pre-generation) all **server**-tagged, plus `friends-and-foes` and `illager-invasion` as **both** — clients must render their mobs. `serene-seasons` is held pending a separate post-launch ruling. Everything else in the conflict table stays out until explicitly approved.")
 W("")
 
 # ---- reconciliation
@@ -256,7 +368,7 @@ W("|---|---|---|---|---|")
 for slug, why in WAVE1:
     W(row(slug, why))
 W("")
-W("### Wave 2 — Quality of life (14) · safe, no world impact")
+W("### Wave 2 — Quality of life (12) · safe, no world impact")
 W("")
 W("| Mod | Category | Slug | Side | Why |")
 W("|---|---|---|---|---|")
@@ -290,7 +402,21 @@ W("**Do not re-import these in any future pass, regardless of how well they scre
 W("")
 W("| Mod | Slug | Ruling |")
 W("|---|---|---|")
-W("| Magnum Torch | `magnum-torch` | **Permanently rejected.** It suppresses all natural mob spawning in a large radius around the placed block. That is precisely the mechanic menagerie's territory system is built on: menagerie's 8 animals claim and hold territory via natural spawn pressure, so a Magnum Torch silently voids territory behaviour for every chunk in range — with no error, no log line, and no obvious cause. The failure mode is invisible, which is what makes it worse than an outright crash. Screens as `AVAILABLE_26.2` and looks like a harmless QoL torch; it is not. Ruled out by Jesse 2026-08-16. |")
+for _slug, _ruling in DO_NOT_ADOPT.items():
+    _r = by_slug.get(_slug) or eq_by_slug.get(_slug)
+    _title = _r["modrinthTitle"] if _r else _slug
+    W(f"| {_title} | `{_slug}` | {_ruling} |")
+W("")
+W("## ℹ️ Known benign warnings — expected, not defects")
+W("")
+W("Lines that appear on **every** launch and **every** `load-check` run, are understood, and should not be silenced by adding a mod. Recorded so a later pass does not spend a session rediscovering they are harmless — or 'fix' one by growing the manifest for a cosmetic reason.")
+W("")
+W("These are `recommends`, not `depends`. `load-check` prints them as `~` warnings and exits **0**; only an unsatisfied `depends` is an error.")
+W("")
+W("| Warning | Where | Verdict |")
+W("|---|---|---|")
+for _warning, _where, _verdict in BENIGN_WARNINGS:
+    W(f"| {_warning} | {_where} | {_verdict} |")
 W("")
 W("## ⚠️ Conflict flags — need your explicit approval")
 W("")
@@ -376,5 +502,5 @@ W("## Next step")
 W("")
 W("Wave 3 waits for the fresh-world day and the Terralith-vs-BoP ruling. Re-run `tools/bmc-screen.js` before that pass — the watchlist above moves fast, and `yungs-api` reaching 26.2 would unblock the whole YUNG's suite at once.")
 
-open("/Users/jessehagy/Desktop/mod-installer/bmc-cherrypick-report.md", "w").write("\n".join(out) + "\n")
-print("wrote bmc-cherrypick-report.md:", len(out), "lines")
+open(args.out, "w").write("\n".join(out) + "\n")
+print("wrote", args.out + ":", len(out), "lines")
