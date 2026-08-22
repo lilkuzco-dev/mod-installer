@@ -167,9 +167,9 @@
       "side": "both"
     },
     {
-      "filename": "warfront-0.4.17.jar",
-      "url": "https://github.com/lilkuzco-dev/warfront/releases/download/v0.4.17/warfront-0.4.17.jar",
-      "sha512": "f7bdd297a8fb355592605a248f192243c9dcca330f88f7d76ef1b471514cdb40fcd624c2d4acc8e615ca30003949ee294fa31c5f2b6d0f3cbee855ec1a128d3f",
+      "filename": "warfront-0.4.18.jar",
+      "url": "https://github.com/lilkuzco-dev/warfront/releases/download/v0.4.18/warfront-0.4.18.jar",
+      "sha512": "574cb1315ea906fccd23333d636b51cb15f8d93f8f42d270b33242748165fd7b2bbf8c63e90c3c0ad5e0415f1b7e6e2e859bbcf1736323cf232f3f9fa6ad1dd7",
       "side": "both"
     },
     {
@@ -221,9 +221,9 @@
       "side": "both"
     },
     {
-      "filename": "waldschatten-0.1.2.jar",
-      "url": "https://github.com/lilkuzco-dev/waldschatten/releases/download/v0.1.2/waldschatten-0.1.2.jar",
-      "sha512": "9559d60b4656f364a1d7e7810adec1b763b589b22e0bf90420002ec56f034b30c900642eb3f0c9278d5186039a241bd38ebf81aa2c10d578201d670fd47604d8",
+      "filename": "waldschatten-0.1.3.jar",
+      "url": "https://github.com/lilkuzco-dev/waldschatten/releases/download/v0.1.3/waldschatten-0.1.3.jar",
+      "sha512": "c326a672ee9d9f34d89282903896e25b0772fdf7c62b3309c82fc33b1fca23328a864acda6c400f20a19a3b49c38c0c4a13a4053a23d0dff5bd3c57419527722",
       "side": "both"
     },
     {
@@ -239,9 +239,9 @@
       "side": "server"
     },
     {
-      "filename": "enchanted-forest-0.1.10.jar",
-      "url": "https://github.com/lilkuzco-dev/enchanted-forest/releases/download/v0.1.10/enchanted-forest-0.1.10.jar",
-      "sha512": "56cc4a983a045d2ec1ec2b7b340899a76b7a71d4a18d93dce5ac7cb5996aa6f1b7b918976c623bf09b85b3e05ba783f9399f69ec28ba02c99520fddfb2afdf7c",
+      "filename": "enchanted-forest-0.1.11.jar",
+      "url": "https://github.com/lilkuzco-dev/enchanted-forest/releases/download/v0.1.11/enchanted-forest-0.1.11.jar",
+      "sha512": "59285b33b456a4a527c7ba794a9e58a7ae0b6b3fe0ba346f8cd5e718b0e03101bc5cfaf7b857ac7d53483659f3dc6b3b2a78c00b8d4a971d6aa27194c3c5e159",
       "side": "both"
     },
     {
